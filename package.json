@@ -1,66 +1,66 @@
 {
-  "name": "wtr-lab-novel-reviewer",
-  "version": "1.8.0",
-  "description": "Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.",
-  "author": "MasuRii",
-  "license": "MIT",
-  "private": true,
-  "main": "dist/main.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MasuRii/wtr-lab-novel-reviewer.git"
-  },
-  "bugs": {
-    "url": "https://github.com/MasuRii/wtr-lab-novel-reviewer/issues"
-  },
-  "keywords": [
-    "novel",
-    "analysis",
-    "gemini",
-    "ai",
-    "wtr-lab",
-    "literature",
-    "review",
-    "assessment",
-    "userscript"
-  ],
-  "files": [
-    "dist/",
-    "src/"
-  ],
-  "scripts": {
-    "build": "npm run format && npm run lint:fix && npm run version:update && webpack --mode=production",
-    "build:performance": "npm run format && npm run lint:fix && webpack --config webpack.config.js --mode=production",
-    "build:greasyfork": "npm run format && npm run lint:fix && webpack --config webpack.config.js --mode=production",
-    "build:devbundle": "npm run format && npm run lint:fix && webpack --config webpack.config.js --mode=development",
-    "dev": "webpack serve --config webpack.config.js --mode=development",
-    "lint": "npm run lint:js && npm run lint:css",
-    "lint:check": "npm run lint:js && npm run lint:css",
-    "lint:fix": "npm run lint:js:fix && npm run lint:css:fix",
-    "lint:js": "eslint src/ --ext .js --max-warnings 0",
-    "lint:js:fix": "eslint src/ --ext .js --fix",
-    "lint:css": "stylelint \"src/styles/**/*.css\" --max-warnings 0",
-    "lint:css:fix": "stylelint \"src/styles/**/*.css\" --fix",
-    "format": "prettier --write \"src/**/*.{js,css}\"",
-    "version:update": "node scripts/update-versions.js update",
-    "version:check": "node scripts/update-versions.js version",
-    "version:banner": "node scripts/update-versions.js banner",
-    "version:header": "node scripts/update-versions.js header"
-  },
-  "devDependencies": {
-    "css-loader": "^7.1.2",
-    "eslint": "^9.39.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-prettier": "^5.5.4",
-    "prettier": "^3.6.2",
-    "style-loader": "^4.0.0",
-    "stylelint": "^16.25.0",
-    "stylelint-prettier": "^5.0.3",
-    "stylelint-config-standard": "^39.0.1",
-    "webpack": "^5.102.1",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.2",
-    "webpack-userscript": "^3.2.3"
-  }
+	"name": "wtr-lab-novel-reviewer",
+	"version": "1.8.1",
+	"description": "Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.",
+	"author": "MasuRii",
+	"license": "MIT",
+	"private": true,
+	"main": "dist/main.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/MasuRii/wtr-lab-novel-reviewer.git"
+	},
+	"bugs": {
+		"url": "https://github.com/MasuRii/wtr-lab-novel-reviewer/issues"
+	},
+	"keywords": [
+		"novel",
+		"analysis",
+		"gemini",
+		"ai",
+		"wtr-lab",
+		"literature",
+		"review",
+		"assessment",
+		"userscript"
+	],
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"scripts": {
+		"build": "npm run format && npm run lint:fix && npm run version:update && webpack --mode=production",
+		"build:performance": "npm run format && npm run lint:fix && webpack --config webpack.config.js --mode=production",
+		"build:greasyfork": "npm run format && npm run lint:fix && webpack --config webpack.config.js --mode=production",
+		"build:devbundle": "npm run format && npm run lint:fix && webpack --config webpack.config.js --mode=development",
+		"dev": "webpack serve --config webpack.config.js --mode=development",
+		"lint": "npm run lint:js && npm run lint:css",
+		"lint:check": "npm run lint:js && npm run lint:css",
+		"lint:fix": "npm run lint:js:fix && npm run lint:css:fix",
+		"lint:js": "eslint src/ --ext .js --max-warnings 0",
+		"lint:js:fix": "eslint src/ --ext .js --fix",
+		"lint:css": "stylelint \"src/**/**/*.css\" --max-warnings 0",
+		"lint:css:fix": "stylelint \"src/**/**/*.css\" --fix",
+		"format": "prettier --write \"src/**/*.{js,css}\"",
+		"version:update": "node scripts/update-versions.js update",
+		"version:check": "node scripts/update-versions.js version",
+		"version:banner": "node scripts/update-versions.js banner",
+		"version:header": "node scripts/update-versions.js header"
+	},
+	"devDependencies": {
+		"css-loader": "^7.1.2",
+		"eslint": "^9.39.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-import": "^2.32.0",
+		"eslint-plugin-prettier": "^5.5.4",
+		"prettier": "^3.6.2",
+		"style-loader": "^4.0.0",
+		"stylelint": "^16.25.0",
+		"stylelint-prettier": "^5.0.3",
+		"stylelint-config-standard": "^39.0.1",
+		"webpack": "^5.102.1",
+		"webpack-cli": "^6.0.1",
+		"webpack-dev-server": "^5.2.2",
+		"webpack-userscript": "^3.2.3"
+	}
 }

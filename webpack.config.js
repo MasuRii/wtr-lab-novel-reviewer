@@ -14,13 +14,17 @@ const COMMON_META = {
   namespace: "http://tampermonkey.net/",
   match: "https://wtr-lab.com/en/for-you*",
   icon: "https://www.google.com/s2/favicons?sz=64&domain=wtr-lab.com",
-  connect: "generativelanguage.googleapis.com",
+  connect: [
+    "generativelanguage.googleapis.com",
+    "fonts.googleapis.com"
+  ],
   grant: [
     "GM_setValue",
     "GM_getValue",
     "GM_addStyle",
     "GM_registerMenuCommand",
     "GM_xmlhttpRequest",
+    "GM_getResourceText",
   ],
   "run-at": "document-idle",
   supportURL: "https://github.com/MasuRii/wtr-lab-novel-reviewer/issues",

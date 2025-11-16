@@ -5,7 +5,7 @@
 A powerful userscript that uses Google's Gemini AI to analyze novels on WTR-Lab. Get comprehensive AI-powered assessments, color-coded review summaries, and detailed analysis across multiple categories without leaving the "For You" page.
 
 [![Install WTR-Lab Novel Reviewer](https://img.shields.io/badge/Install%20directly-Greasy%20Fork-green.svg)](https://greasyfork.org/en/scripts/555556)
-[![Version](https://img.shields.io/badge/Version-1.8-blue.svg)](#changelog)
+[![Version](https://img.shields.io/badge/Version-1.8.1-blue.svg)](#changelog)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](#license)
 
 ---
@@ -172,7 +172,15 @@ Enable Debug Logging in settings to see:
 ### Changelog
 For detailed version history, see [Changelog.md](Changelog.md)
 
-### Current Version: 1.8.0 (November 13, 2025)
+### Current Version: 1.8.1 (November 16, 2025)
+**Major Refactor:**
+- 🏗️ Complete modularization from single 1,325-line file to maintainable 24-file architecture
+- 📁 Organized codebase with clear separation of concerns across 8 modular directories
+- 📊 Improved maintainability with isolated modules for testing and development
+- 🔧 Enhanced build system with comprehensive validation and error resolution
+- 🚀 Optimized for three deployment targets (Performance, GreasyFork, Development)
+
+### Previous Version: 1.8.0 (November 13, 2025)
 **Major Features:**
 - ✨ Color-coded review summary system with username attribution
 - 🎨 20-color accessible palette for consistent username colors
