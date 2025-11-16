@@ -19,12 +19,12 @@ export function createSettingsPanel() {
 		<input type="password" id="gemini-api-key-input">
 		<label for="gemini-model-select">Gemini Model:</label>
 		<select id="gemini-model-select">${modelOptions}</select>
-		<label for="gemini-debug-logging-input" style="display: flex; align-items: center;">
-			<input type="checkbox" id="gemini-debug-logging-input" style="width: auto; margin-right: 10px;">
+		<label for="gemini-debug-logging-input" class="debug-logging-label">
+			<input type="checkbox" id="gemini-debug-logging-input">
 			Enable Debug Logging (Logs prompts and responses)
 		</label>
 		<div class="buttons">
-			<button id="clear-cache-button" style="background-color: #dc3545; margin-right: auto;">Clear Analyzed Novel Cache</button>
+			<button id="clear-cache-button" class="clear-cache-btn">Clear Analyzed Novel Cache</button>
 			<button id="gemini-settings-close">Close</button>
 			<button id="gemini-settings-save">Save</button>
 		</div>

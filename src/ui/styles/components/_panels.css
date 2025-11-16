@@ -11,7 +11,8 @@
 	border-radius: 8px;
 	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
 	z-index: 9999;
-	width: 400px;
+	max-width: 500px;
+	width: 100%;
 }
 
 #gemini-settings-panel h3 {
@@ -34,13 +35,35 @@
 	box-sizing: border-box;
 }
 
-#gemini-settings-panel .buttons {
-	margin-top: 20px;
-	text-align: right;
+/* Debug logging label with flexbox for checkbox alignment */
+#gemini-settings-panel .debug-logging-label {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
+#gemini-settings-panel .debug-logging-label input[type="checkbox"] {
+	width: auto;
+	margin: 0;
+}
+
+#gemini-settings-panel .buttons {
+	margin-top: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+}
+
+/* Clear cache button pushed to the left */
+#gemini-settings-panel .clear-cache-btn {
+	background-color: #dc3545;
+	color: white;
+	margin-right: auto;
+}
+
+/* General button styling */
 #gemini-settings-panel button {
-	margin-left: 10px;
 	padding: 8px 15px;
 	border-radius: 4px;
 	border: none;
@@ -70,7 +93,8 @@
 	border-radius: 8px;
 	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
 	z-index: 9999;
-	width: 500px;
+	width: 100%;
+	max-width: 500px;
 	max-height: 80vh;
 	overflow-y: auto;
 }
@@ -112,11 +136,12 @@
 
 #gemini-api-key-modal .buttons {
 	margin-top: 20px;
-	text-align: center;
+	display: flex;
+	justify-content: flex-end;
 }
 
 #gemini-api-key-modal button {
-	margin: 0 10px;
+	margin: 0 0 0 10px;
 	padding: 8px 15px;
 	border-radius: 4px;
 	border: none;

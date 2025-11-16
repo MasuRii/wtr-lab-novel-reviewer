@@ -54,14 +54,79 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Mobile considerations */
 	}
 
 	#gemini-api-key-modal {
-		width: 90%;
+		width: 95%;
 		padding: 15px;
+	}
+
+	#gemini-api-key-modal .buttons {
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	#gemini-api-key-modal button {
+		width: 100%;
+		margin: 0;
+	}
+
+	/* Settings Panel responsive design */
+	#gemini-settings-panel {
+		width: 95%;
+		max-width: none;
+		padding: 15px;
+	}
+
+	#gemini-settings-panel .buttons {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 10px;
+	}
+
+	#gemini-settings-panel .clear-cache-btn {
+		margin-right: 0;
+		order: 2;
+		width: 100%;
+	}
+
+	#gemini-settings-panel .buttons button:not(.clear-cache-btn) {
+		width: 100%;
+		margin-left: 0;
 	}
 
 	#gemini-mapping-failure-notification {
 		width: calc(100% - 40px);
 		right: 20px;
 		left: 20px;
+	}
+}
+
+/* Extra small screens */
+@media (width <= 600px) {
+	#gemini-settings-panel {
+		width: 98%;
+		padding: 12px;
+	}
+
+	#gemini-settings-panel .buttons {
+		gap: 8px;
+	}
+
+	#gemini-settings-panel button {
+		padding: 10px 12px;
+		font-size: 14px;
+	}
+
+	#gemini-api-key-modal {
+		width: 98%;
+		padding: 12px;
+	}
+
+	#gemini-api-key-modal .buttons {
+		gap: 8px;
+	}
+
+	#gemini-api-key-modal button {
+		padding: 10px 12px;
+		font-size: 14px;
 	}
 }
 `, ""]);
@@ -747,7 +812,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Settings Panel */
 	border-radius: 8px;
 	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
 	z-index: 9999;
-	width: 400px;
+	max-width: 500px;
+	width: 100%;
 }
 
 #gemini-settings-panel h3 {
@@ -770,13 +836,35 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Settings Panel */
 	box-sizing: border-box;
 }
 
-#gemini-settings-panel .buttons {
-	margin-top: 20px;
-	text-align: right;
+/* Debug logging label with flexbox for checkbox alignment */
+#gemini-settings-panel .debug-logging-label {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
+#gemini-settings-panel .debug-logging-label input[type="checkbox"] {
+	width: auto;
+	margin: 0;
+}
+
+#gemini-settings-panel .buttons {
+	margin-top: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+}
+
+/* Clear cache button pushed to the left */
+#gemini-settings-panel .clear-cache-btn {
+	background-color: #dc3545;
+	color: white;
+	margin-right: auto;
+}
+
+/* General button styling */
 #gemini-settings-panel button {
-	margin-left: 10px;
 	padding: 8px 15px;
 	border-radius: 4px;
 	border: none;
@@ -806,7 +894,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Settings Panel */
 	border-radius: 8px;
 	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
 	z-index: 9999;
-	width: 500px;
+	width: 100%;
+	max-width: 500px;
 	max-height: 80vh;
 	overflow-y: auto;
 }
@@ -848,11 +937,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Settings Panel */
 
 #gemini-api-key-modal .buttons {
 	margin-top: 20px;
-	text-align: center;
+	display: flex;
+	justify-content: flex-end;
 }
 
 #gemini-api-key-modal button {
-	margin: 0 10px;
+	margin: 0 0 0 10px;
 	padding: 8px 15px;
 	border-radius: 4px;
 	border: none;
@@ -1669,12 +1759,12 @@ function createSettingsPanel() {
 		<input type="password" id="gemini-api-key-input">
 		<label for="gemini-model-select">Gemini Model:</label>
 		<select id="gemini-model-select">${modelOptions}</select>
-		<label for="gemini-debug-logging-input" style="display: flex; align-items: center;">
-			<input type="checkbox" id="gemini-debug-logging-input" style="width: auto; margin-right: 10px;">
+		<label for="gemini-debug-logging-input" class="debug-logging-label">
+			<input type="checkbox" id="gemini-debug-logging-input">
 			Enable Debug Logging (Logs prompts and responses)
 		</label>
 		<div class="buttons">
-			<button id="clear-cache-button" style="background-color: #dc3545; margin-right: auto;">Clear Analyzed Novel Cache</button>
+			<button id="clear-cache-button" class="clear-cache-btn">Clear Analyzed Novel Cache</button>
 			<button id="gemini-settings-close">Close</button>
 			<button id="gemini-settings-save">Save</button>
 		</div>
