@@ -42,10 +42,11 @@ The WTR-Lab Novel Reviewer is an advanced userscript that enhances the WTR-Lab r
 
 **Key Differentiators:**
 - **Intelligent Batch Processing**: Optimized API usage with smart pagination (60-80% reduction in unnecessary calls)
-- **Advanced Caching**: Local storage-based caching prevents redundant API requests
+- **Advanced Caching**: Local storage-based caching prevents redundant API requests with dedicated cache management
 - **Color-Coded UI**: Accessible 20-color palette for username attribution and assessment visualization
 - **Robust Error Handling**: Comprehensive retry logic with mapping validation safeguards
 - **Modern Architecture**: Built with Webpack, ESLint, Prettier, and automated version management
+- **Enhanced UI/UX**: Complete interface modernization with responsive design and mobile optimization
 
 ---
 
@@ -60,21 +61,30 @@ The WTR-Lab Novel Reviewer is an advanced userscript that enhances the WTR-Lab r
   - **Themes & Messages**: Clarity, relevance, integration, thought provocation
   - **Writing Style**: Prose quality, descriptive language, dialogue naturalness
 - **Intelligent Rating System**: Good/Mixed/Bad/Unknown (for insufficient data)
-- **Batch Processing**: Configurable batch sizes for efficient novel analysis
+- **Single Novel Processing**: Optimized to process one novel at a time for better control
 
 ### 🎨 Visual Enhancements
 - **Color-Coded Review Summaries**: Username attribution with 20-color accessible palette
 - **Card Highlighting**: Background colors indicate overall assessment (Dark Green/Yellow/Red)
 - **Interactive UI Components**: Collapsible summaries with smooth animations
-- **Mobile Responsive**: Optimized display for all screen sizes
+- **Modernized Interface**: Complete UI/UX modernization with contemporary design patterns
+- **Mobile Responsive**: Optimized display for all screen sizes with modal overlay functionality
 - **Accessibility**: Color-blind friendly design with proper contrast ratios
 
 ### 🛠️ Advanced Features
 - **Smart Caching System**: Local storage caching prevents redundant API calls
+- **Cache Management**: Dedicated cache clearing functionality with user confirmation
+- **Context-Aware UI**: Button functionality adapts based on novel analysis state
 - **Serie ID Mapping**: Robust validation system prevents processing errors
 - **Error Recovery**: Comprehensive retry logic with exponential backoff
 - **Debug Mode**: Optional detailed logging for troubleshooting
 - **Performance Optimization**: 60-80% reduction in unnecessary API calls through smart pagination
+
+### 📱 Mobile Enhancements
+- **Modal Overlay**: AI Summary Panel displays as fixed overlay on mobile screens (≤768px)
+- **Touch-Optimized**: Improved button sizing and spacing for mobile interactions
+- **Responsive Design**: Advanced responsive patterns ensuring optimal viewing on all devices
+- **Cross-Device Consistency**: Unified design system implementation across all screen sizes
 
 ---
 
@@ -85,7 +95,7 @@ The WTR-Lab Novel Reviewer is an advanced userscript that enhances the WTR-Lab r
 2. **Get a Gemini API Key** from [Google AI Studio](https://aistudio.google.com/app/apikey)
 3. **Install the script** from [Greasy Fork](https://greasyfork.org/en/scripts/555556)
 4. **Configure API key** in the settings panel
-5. **Navigate to WTR-Lab "For You" page** and click the Analyze button
+5. **Navigate to WTR-Lab "For You" page** and click the analysis button on individual novel cards
 
 ### For Developers
 ```bash
@@ -168,14 +178,14 @@ const GEMINI_MODELS = [
 | Setting | Description | Default | Type |
 |---------|-------------|---------|------|
 | **Gemini API Key** | Google AI API key (required) | - | String |
-| **Batch Limit** | Novels per analysis batch | `5` | Number |
 | **Gemini Model** | AI model selection | `gemini-2.5-flash` | Select |
 | **Debug Logging** | Enable detailed console logs | `Disabled` | Boolean |
+| **Cache Management** | Clear analyzed novel cache functionality | - | Button |
 
 ### Environment Variables
 ```bash
 # Optional environment overrides
-WTR_VERSION=1.8.1          # Version override
+WTR_VERSION=1.8.4          # Version override
 WTR_BUILD_ENV=production   # Build environment
 WTR_BUILD_DATE=2025-11-16  # Build date override
 ```
@@ -186,11 +196,24 @@ WTR_BUILD_DATE=2025-11-16  # Build date override
 
 ### Basic Usage
 1. **Navigate** to [WTR-Lab "For You" page](https://wtr-lab.com/en/for-you)
-2. **Click** the floating **Analyze** button (📊) in the top-right corner
+2. **Click** the analysis button (📊) in the top-right corner of novel card titles
 3. **View** AI assessments displayed as colored icons on novel cards
 4. **Hover** over the ✨ icon to see detailed analysis summaries
+5. **Clear Cache** using the dedicated button in settings when needed
 
-### Advanced Features
+### Enhanced Features
+
+#### Context-Aware Button System
+- **"Analyze Novel"**: For novels without cached analysis
+- **"Show AI Summary"**: For novels with cached analysis
+- **Adaptive Tooltips**: Button text changes based on novel state
+- **Individual Control**: Each novel card has its own analysis trigger
+
+#### Cache Management
+- **Selective Clearing**: Clear only `geminiAssessment_*` prefixed keys
+- **User Confirmation**: Prevents accidental data loss
+- **Visual Feedback**: Success/failure notifications during clearing
+- **Automatic Refresh**: Page reloads after successful cache clearing
 
 #### Color-Coded Assessment System
 - **Dark Green Cards**: Good overall assessment
@@ -211,6 +234,7 @@ const USERNAME_COLORS = [
 - **Automatic**: Assessments cached locally to prevent redundant API calls
 - **Persistent**: Cached data survives page reloads and browser sessions
 - **Validation**: Automatic structure validation ensures data integrity
+- **Management**: User-controlled cache clearing with confirmation prompts
 
 ---
 
@@ -426,7 +450,7 @@ wtr-lab-novel-reviewer/
 
 ## 🏛️ Modular Architecture Benefits
 
-The WTR-Lab Novel Reviewer v1.8.1 represents a significant architectural improvement through modularization, transforming a 1,325-line monolithic file into a maintainable 24-file modular structure.
+The WTR-Lab Novel Reviewer v1.8.4 represents a significant architectural improvement through modularization, transforming a 1,325-line monolithic file into a maintainable 24-file modular structure.
 
 ### 📊 Architecture Metrics
 
@@ -510,10 +534,11 @@ console.log('[WTR-Lab Novel Reviewer Debug]', message, data);
 
 ### Common Test Scenarios
 - **API Key Validation**: Test with valid/invalid API keys
-- **Batch Processing**: Test with different batch sizes
+- **Single Novel Processing**: Test individual novel analysis workflow
 - **Error Recovery**: Test network failures and API rate limits
 - **Caching**: Test cache persistence across sessions
 - **Mapping Validation**: Test serie ID mapping edge cases
+- **Cache Management**: Test cache clearing functionality
 
 ---
 
@@ -536,11 +561,19 @@ console.log('[WTR-Lab Novel Reviewer Debug]', message, data);
 2. Clear browser cache and reload
 3. Ensure script is enabled in userscript manager
 
+#### Cache-Related Issues
+**Symptoms**: Outdated or corrupted analysis data
+**Solutions**:
+1. Use "Clear Analyzed Novel Cache" button in settings
+2. Confirm cache clearing in the prompt dialog
+3. Page will automatically reload after successful clearing
+4. Re-analyze novels to get fresh assessments
+
 #### Performance Issues
 **Symptoms**: Slow analysis or high API usage
 **Solutions**:
-1. Reduce batch size in settings
-2. Use `gemini-2.5-flash` model for faster processing
+1. Use `gemini-2.5-flash` model for faster processing
+2. Clear cache periodically to prevent data buildup
 3. Check browser console for debug information
 
 ### Debug Information
@@ -549,6 +582,7 @@ Enable debug logging to access:
 - Processing status updates
 - Performance metrics
 - Error stack traces
+- Cache management operations
 
 ---
 
@@ -669,13 +703,19 @@ async function fetchReviews(serieId) {
 }
 ```
 
-#### 4. Caching System
+#### 4. Enhanced Caching System
 ```javascript
-// Local storage-based caching with validation
+// Local storage-based caching with management
 function getCachedAssessment(serieId) {
   // Validates cached data structure
   // Prevents corrupted cache usage
   // Automatic cleanup on errors
+}
+
+function clearAllCachedAssessments() {
+  // Clears only geminiAssessment_* prefixed keys
+  // Provides user confirmation
+  // Offers visual feedback
 }
 ```
 
@@ -691,6 +731,7 @@ Result Caching
 2. **Retry Logic**: Exponential backoff for transient failures
 3. **User Feedback**: Clear error messages and recovery instructions
 4. **Graceful Degradation**: Partial functionality when possible
+5. **Cache Management**: User-controlled cache operations with confirmation
 
 ---
 
@@ -779,6 +820,11 @@ if (parsed && typeof parsed === 'object' && parsed.assessment) {
 }
 ```
 
+#### Cache Management
+- **Selective Clearing**: Only targets analysis cache, not general site cache
+- **User Control**: Confirmation prompts prevent accidental data loss
+- **Performance Benefits**: Reduces redundant API calls for re-analysis
+
 ### Memory Management
 - **Efficient DOM Manipulation**: Minimize reflows and repaints
 - **Event Delegation**: Single event listeners for dynamic content
@@ -788,6 +834,7 @@ if (parsed && typeof parsed === 'object' && parsed.assessment) {
 - **Tree Shaking**: Remove unused code with webpack
 - **Code Splitting**: Separate vendor and application code
 - **Minification**: Compress JavaScript and CSS for production
+- **CSS Modularization**: Component-based CSS architecture (v1.8.3+)
 
 ---
 
@@ -821,6 +868,7 @@ function validateSerieIdMapping(rawId, serieId) {
 - **Minimal Permissions**: Only requests necessary permissions
 - **External Domains**: Only connects to required APIs (generativelanguage.googleapis.com)
 - **Sandboxed Execution**: Runs in userscript environment with limited privileges
+- **Enhanced Matching**: Explicit URL pattern matching for paginated pages (v1.8.4+)
 
 ---
 
@@ -828,13 +876,28 @@ function validateSerieIdMapping(rawId, serieId) {
 
 All notable changes to this project are documented in [CHANGELOG.md](CHANGELOG.md).
 
-### Recent Changes (v1.8.1)
-- 🏗️ Complete modularization from single 1,325-line file to maintainable 24-file architecture
-- 📁 Organized codebase with clear separation of concerns across 8 modular directories
-- 📊 Improved maintainability with isolated modules for testing and development
-- 🔧 Enhanced build system with comprehensive validation and error resolution
-- 🚀 Optimized for three deployment targets (Performance, GreasyFork, Development)
-- 🛠️ Improved developer experience with clear module boundaries and documentation
+### Recent Changes (v1.8.4)
+- 🚀 **Cache Management**: Implemented dedicated cache clearing functionality with user confirmation
+- 🔄 **UI Consolidation**: Removed floating analysis button and centralized functionality in card-level triggers
+- 🏗️ **Interface Modernization**: Complete UI/UX modernization with responsive design improvements
+- 🐛 **Bug Fixes**: Resolved pagination matching issues and positioning problems
+- 📱 **Mobile Enhancement**: Added modal overlay behavior for AI Summary Panel on mobile devices
+- 🎨 **Design System**: Applied Flexbox-based solutions and modern design patterns
+
+### Previous Changes (v1.8.3)
+- 🏗️ **CSS Modularization**: Complete modularization of 1,325-line monolithic CSS into component-based structure
+- ❌ **Cleanup**: Eliminated duplicate CSS and dynamic style injection
+- 🔄 **Build System**: Switched to webpack's CSS processing for better optimization
+
+### Previous Changes (v1.8.2)
+- ❌ **Batch Processing**: Removed configurable batch processing, now processes 1 novel at a time
+- 🏗️ **Architecture**: Streamlined processing architecture for better control
+
+### Previous Changes (v1.8.1)
+- 🏗️ **Complete Modularization**: Transform from 1,325-line file to maintainable 24-file architecture
+- 📁 **Code Organization**: Clear separation of concerns across 8 modular directories
+- 🔧 **Build System**: Enhanced validation and error resolution
+- 🚀 **Deployment**: Optimized for three deployment targets (Performance, GreasyFork, Development)
 
 ### Previous Changes (v1.8.0)
 - ✨ Color-coded review summary system with username attribution

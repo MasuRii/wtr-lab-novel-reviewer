@@ -21,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated DOM structure to move button as direct child of `.title-wrap` container while preserving existing event listeners
 - Modified CSS positioning to place button absolutely within title area with proper vertical centering
 - Enhanced title area with `padding-right` to prevent text overlap with relocated button
+- Transferred analysis initiation logic from floating button to novel card summary trigger button (`.gemini-summary-trigger`)
+- Implemented dual-purpose trigger functionality: analyze uncached novels, show summary for cached ones
+- Modified trigger button click handler to conditionally execute analysis workflow based on novel card state
+- Updated button tooltip to display "Analyze Novel" (uncached) vs "Show AI Summary" (cached) based on analysis state
+- Ensured trigger button appears on all novel cards regardless of cache status
 
 ### ❌ Removed
 - Completely removed floating analysis button (`.gemini-floating-analyze-btn`) and all related functionality
@@ -29,31 +34,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cleaned up duplicate CSS styles for floating button from both modular and monolithic stylesheets
 - Removed floating button positioning and styling rules from component-based CSS architecture
 
-### 🔄 Changed
-- Transferred analysis initiation logic from floating button to novel card summary trigger button (`.gemini-summary-trigger`)
-- Implemented dual-purpose trigger functionality: analyze uncached novels, show summary for cached ones
-- Modified trigger button click handler to conditionally execute analysis workflow based on novel card state
-- Updated button tooltip to display "Analyze Novel" (uncached) vs "Show AI Summary" (cached) based on analysis state
-- Ensured trigger button appears on all novel cards regardless of cache status
-
 ### 🏗️ Refactored
 - Consolidated user interface by removing redundant floating button and centralizing functionality in card-level triggers
 - Implemented context-aware button behavior that adapts functionality based on novel analysis state
 - Restructured processing workflow to work with individual novel card triggers instead of global floating button
 - Modified `updateCardUI()` function to integrate analysis workflow initiation logic
-
-### 📱 Mobile
-- Implemented modal overlay behavior for AI Summary Panel (`.gemini-summary-card`) on screens ≤768px
-- Set summary card to `position: fixed` with viewport centering for better mobile usability
-- Added responsive dimensions with `width: 90%`, `max-width: 400px`, and `max-height: 80vh`
-- Increased z-index to ensure proper overlay positioning over other content
+- Comprehensive code refactoring and cleanup of UI components for improved maintainability
+- Streamlined CSS architecture with modern layout techniques and optimized styling approach
+- Consolidated duplicate styling rules and eliminated redundant component implementations
+- Improved code organization with better separation of concerns between UI and business logic
+- Enhanced component modularity and reusability across different interface sections
 
 ### 🐛 Fixed
 - Corrected desktop positioning of AI Summary Panel (`.gemini-summary-card`) to restore original location (right of novel card)
 - Reverted incorrect positioning that had moved panel below card in desktop view
 - Maintained proper vertical centering and spacing for desktop layout while preserving mobile modal functionality
-
-### 🐛 Fixed
 - Resolved issue where userscript didn't match paginated pages (e.g., `?page=2`, `?page=6`)
 - Implemented explicit `@match` patterns to handle query parameters correctly
 - Changed from single pattern `https://wtr-lab.com/en/for-you*` to dual patterns:
@@ -76,14 +71,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced mobile compatibility with touch-optimized controls and responsive breakpoints
 - Updated visual styling with contemporary design language and improved accessibility standards
 
-### 🏗️ Refactored
-- Comprehensive code refactoring and cleanup of UI components for improved maintainability
-- Streamlined CSS architecture with modern layout techniques and optimized styling approach
-- Consolidated duplicate styling rules and eliminated redundant component implementations
-- Improved code organization with better separation of concerns between UI and business logic
-- Enhanced component modularity and reusability across different interface sections
-
 ### 📱 Enhanced
+- Implemented modal overlay behavior for AI Summary Panel (`.gemini-summary-card`) on screens ≤768px
+- Set summary card to `position: fixed` with viewport centering for better mobile usability
+- Added responsive dimensions with `width: 90%`, `max-width: 400px`, and `max-height: 80vh`
+- Increased z-index to ensure proper overlay positioning over other content
 - Implemented advanced responsive design patterns ensuring optimal viewing on all device sizes
 - Optimized mobile touch interactions with improved button sizing and spacing
 - Enhanced mobile navigation with better scroll behavior and touch target optimization
