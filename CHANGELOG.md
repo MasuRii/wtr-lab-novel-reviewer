@@ -13,6 +13,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Modified CSS positioning to place button absolutely within title area with proper vertical centering
 - Enhanced title area with `padding-right` to prevent text overlap with relocated button
 
+### ❌ Removed
+- Completely removed floating analysis button (`.gemini-floating-analyze-btn`) and all related functionality
+- Eliminated `createFloatingButton()` function from UI components library
+- Removed floating button import and initialization from main application logic
+- Cleaned up duplicate CSS styles for floating button from both modular and monolithic stylesheets
+- Removed floating button positioning and styling rules from component-based CSS architecture
+
+### 🔄 Changed
+- Transferred analysis initiation logic from floating button to novel card summary trigger button (`.gemini-summary-trigger`)
+- Implemented dual-purpose trigger functionality: analyze uncached novels, show summary for cached ones
+- Modified trigger button click handler to conditionally execute analysis workflow based on novel card state
+- Updated button tooltip to display "Analyze Novel" (uncached) vs "Show AI Summary" (cached) based on analysis state
+- Ensured trigger button appears on all novel cards regardless of cache status
+
+### 🏗️ Refactored
+- Consolidated user interface by removing redundant floating button and centralizing functionality in card-level triggers
+- Implemented context-aware button behavior that adapts functionality based on novel analysis state
+- Restructured processing workflow to work with individual novel card triggers instead of global floating button
+- Modified `updateCardUI()` function to integrate analysis workflow initiation logic
+
 ### 📱 Mobile
 - Implemented modal overlay behavior for AI Summary Panel (`.gemini-summary-card`) on screens ≤768px
 - Set summary card to `position: fixed` with viewport centering for better mobile usability

@@ -6,7 +6,6 @@
 import { loadConfig } from "./config/settings.js"
 import { validateAndBuildSerieIdMap } from "./core/mapping.js"
 import { createSettingsPanel, createApiKeyModal, setupConfig } from "./ui/components/panels.js"
-import { createFloatingButton } from "./ui/components/buttons.js"
 import { displayCachedAssessments } from "./processing/workflow.js"
 import { showMappingFailureNotification } from "./core/mapping.js"
 
@@ -33,7 +32,6 @@ export async function main() {
 
 	const observer = new MutationObserver(() => {
 		if (document.querySelector(".series-list")) {
-			createFloatingButton()
 			displayCachedAssessments()
 		}
 	})

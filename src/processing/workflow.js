@@ -50,8 +50,9 @@ export function displayCachedAssessments() {
 			}
 		}
 
+		let cachedAnalysis = null
 		if (serieId) {
-			let cachedAnalysis = getCachedAssessment(serieId)
+			cachedAnalysis = getCachedAssessment(serieId)
 			if (cachedAnalysis) {
 				// Ensure cached analysis has availableUsernames for color coding
 				if (!cachedAnalysis.availableUsernames) {
@@ -59,9 +60,13 @@ export function displayCachedAssessments() {
 				}
 				// Ensure unknown field exists for backward compatibility
 				cachedAnalysis = populateUnknownField(cachedAnalysis)
-				updateCardUI(card, cachedAnalysis)
 			}
 		}
+
+		// Always call updateCardUI - with cachedAnalysis if available, or null if not
+		// This ensures all novels get a trigger button (dual-purpose: analyze or show summary)
+		updateCardUI(card, cachedAnalysis)
+
 		// Mark as checked for cached status
 		card.dataset.geminiCachedChecked = "true"
 	})

@@ -710,33 +710,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Material Icons font declarations */
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `/* Floating Action Button */
-#gemini-floating-analyze-btn {
-	position: fixed;
-	top: 20px;
-	right: 20px;
-	width: 56px;
-	height: 56px;
-	background-color: #0d6efd;
-	color: white;
-	border: none;
-	border-radius: 50%;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 4px 8px rgb(0 0 0 / 30%);
-	z-index: 9998;
-	transition: background-color 0.3s ease;
-}
-
-#gemini-floating-analyze-btn:hover {
-	background-color: #0b5ed7;
-}
-
-#gemini-floating-analyze-btn .material-icons {
-	font-size: 28px;
-}
+___CSS_LOADER_EXPORT___.push([module.id, `/* Button Components */
 `, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
@@ -1855,6 +1829,7 @@ function colorCodeReviewSummary(reviewSummary, availableUsernames) {
 
 
 
+
 /**
  * Get CSS class for rating
  * @param {string} rating - The rating value
@@ -1921,35 +1896,23 @@ function populateUnknownField(analysis) {
  * @param {Object} analysis - The assessment analysis
  */
 function updateCardUI(card, analysis) {
-	// Populate unknown field if missing (backward compatibility)
-	analysis = populateUnknownField(analysis)
+	// Check if we have analysis data to display
+	const hasAnalysis = analysis && analysis.assessment && analysis.summary
 
-	if (!analysis || !analysis.assessment || !analysis.summary) {
-		return
+	// Only populate unknown field and add card styling if we have analysis
+	if (hasAnalysis) {
+		// Populate unknown field if missing (backward compatibility)
+		analysis = populateUnknownField(analysis)
+
+		const assessmentLower = analysis.assessment.toLowerCase()
+		if (assessmentLower === "good") {
+			card.classList.add("gemini-good-novel")
+		} else if (assessmentLower === "mixed") {
+			card.classList.add("gemini-mixed-novel")
+		} else if (assessmentLower === "bad") {
+			card.classList.add("gemini-bad-novel")
+		}
 	}
-
-	const assessmentLower = analysis.assessment.toLowerCase()
-	if (assessmentLower === "good") {
-		card.classList.add("gemini-good-novel")
-	} else if (assessmentLower === "mixed") {
-		card.classList.add("gemini-mixed-novel")
-	} else if (assessmentLower === "bad") {
-		card.classList.add("gemini-bad-novel")
-	}
-
-	const container = document.createElement("div")
-	container.className = "gemini-summary-container"
-
-	const overallClass = getRatingClass(analysis.assessment)
-	const characterClass = getRatingClass(analysis.characterDevelopment)
-	const plotClass = getRatingClass(analysis.plotStructure)
-	const worldClass = getRatingClass(analysis.worldBuilding)
-	const themesClass = getRatingClass(analysis.themesAndMessages)
-	const writingClass = getRatingClass(analysis.writingStyle)
-	const unknownClass = getRatingClass(analysis.unknown)
-
-	// Extract usernames for color coding (if available in analysis)
-	const availableUsernames = analysis.availableUsernames || []
 
 	// Use fallback icons if Material Icons are not available
 	const iconConfig = window.__ICON_REPLACEMENTS__
@@ -1964,65 +1927,87 @@ function updateCardUI(card, analysis) {
 				autoAwesomeIcon: "auto_awesome",
 			}
 
-	let detailedAssessment = `<h4>AI Novel Assessment</h4>`
-	detailedAssessment += `<div class="summary-toggle collapsed" data-target="novel-summary">`
-	detailedAssessment += `<span>Novel Summary</span>`
-	detailedAssessment += `<span class="${iconConfig.iconClass} toggle-icon">${iconConfig.expandIcon}</span>`
-	detailedAssessment += `</div>`
-	detailedAssessment += `<div class="summary-content" id="novel-summary">`
-	detailedAssessment += `<p>${analysis.novelSummary}</p>`
-	detailedAssessment += `</div>`
+	const container = document.createElement("div")
+	container.className = "gemini-summary-container"
 
-	// Apply color coding to review summary
-	const coloredReviewSummary = colorCodeReviewSummary(analysis.reviewSummary, availableUsernames)
+	let summaryCard = null
 
-	detailedAssessment += `<div class="summary-toggle collapsed" data-target="review-summary">`
-	detailedAssessment += `<span>Review Summary</span>`
-	detailedAssessment += `<span class="${iconConfig.iconClass} toggle-icon">${iconConfig.expandIcon}</span>`
-	detailedAssessment += `</div>`
-	detailedAssessment += `<div class="summary-content" id="review-summary">`
-	detailedAssessment += `<p>${coloredReviewSummary}</p>`
-	detailedAssessment += `</div>`
+	// Only create the summary content if we have analysis data
+	if (hasAnalysis) {
+		const overallClass = getRatingClass(analysis.assessment)
+		const characterClass = getRatingClass(analysis.characterDevelopment)
+		const plotClass = getRatingClass(analysis.plotStructure)
+		const worldClass = getRatingClass(analysis.worldBuilding)
+		const themesClass = getRatingClass(analysis.themesAndMessages)
+		const writingClass = getRatingClass(analysis.writingStyle)
+		const unknownClass = getRatingClass(analysis.unknown)
 
-	detailedAssessment += `<div class="assessment-section">`
-	detailedAssessment += `<strong>Overall Assessment:</strong> <span class="assessment-rating ${overallClass}">${analysis.assessment}</span><br><hr style="margin: 5px 0;">`
-	detailedAssessment += `<strong>Analysis Summary:</strong> ${analysis.summary}<br><hr style="margin: 5px 0;">`
+		// Extract usernames for color coding (if available in analysis)
+		const availableUsernames = analysis.availableUsernames || []
 
-	if (analysis.characterDevelopment) {
-		const displayValue =
-			analysis.characterDevelopment === "Unknown" ? "Insufficient Data" : analysis.characterDevelopment
-		detailedAssessment += `<strong>Character Development:</strong> <span class="assessment-rating ${characterClass}">${displayValue}</span><br>`
+		let detailedAssessment = `<h4>AI Novel Assessment</h4>`
+		detailedAssessment += `<div class="summary-toggle collapsed" data-target="novel-summary">`
+		detailedAssessment += `<span>Novel Summary</span>`
+		detailedAssessment += `<span class="${iconConfig.iconClass} toggle-icon">${iconConfig.expandIcon}</span>`
+		detailedAssessment += `</div>`
+		detailedAssessment += `<div class="summary-content" id="novel-summary">`
+		detailedAssessment += `<p>${analysis.novelSummary}</p>`
+		detailedAssessment += `</div>`
+
+		// Apply color coding to review summary
+		const coloredReviewSummary = colorCodeReviewSummary(analysis.reviewSummary, availableUsernames)
+
+		detailedAssessment += `<div class="summary-toggle collapsed" data-target="review-summary">`
+		detailedAssessment += `<span>Review Summary</span>`
+		detailedAssessment += `<span class="${iconConfig.iconClass} toggle-icon">${iconConfig.expandIcon}</span>`
+		detailedAssessment += `</div>`
+		detailedAssessment += `<div class="summary-content" id="review-summary">`
+		detailedAssessment += `<p>${coloredReviewSummary}</p>`
+		detailedAssessment += `</div>`
+
+		detailedAssessment += `<div class="assessment-section">`
+		detailedAssessment += `<strong>Overall Assessment:</strong> <span class="assessment-rating ${overallClass}">${analysis.assessment}</span><br><hr style="margin: 5px 0;">`
+		detailedAssessment += `<strong>Analysis Summary:</strong> ${analysis.summary}<br><hr style="margin: 5px 0;">`
+
+		if (analysis.characterDevelopment) {
+			const displayValue =
+				analysis.characterDevelopment === "Unknown" ? "Insufficient Data" : analysis.characterDevelopment
+			detailedAssessment += `<strong>Character Development:</strong> <span class="assessment-rating ${characterClass}">${displayValue}</span><br>`
+		}
+		if (analysis.plotStructure) {
+			const displayValue = analysis.plotStructure === "Unknown" ? "Insufficient Data" : analysis.plotStructure
+			detailedAssessment += `<strong>Plot Structure:</strong> <span class="assessment-rating ${plotClass}">${displayValue}</span><br>`
+		}
+		if (analysis.worldBuilding) {
+			const displayValue = analysis.worldBuilding === "Unknown" ? "Insufficient Data" : analysis.worldBuilding
+			detailedAssessment += `<strong>World-Building:</strong> <span class="assessment-rating ${worldClass}">${displayValue}</span><br>`
+		}
+		if (analysis.themesAndMessages) {
+			const displayValue =
+				analysis.themesAndMessages === "Unknown" ? "Insufficient Data" : analysis.themesAndMessages
+			detailedAssessment += `<strong>Themes & Messages:</strong> <span class="assessment-rating ${themesClass}">${displayValue}</span><br>`
+		}
+		if (analysis.writingStyle) {
+			const displayValue = analysis.writingStyle === "Unknown" ? "Insufficient Data" : analysis.writingStyle
+			detailedAssessment += `<strong>Writing Style:</strong> <span class="assessment-rating ${writingClass}">${displayValue}</span><br>`
+		}
+
+		// Only show the legacy Unknown section for backward compatibility with cached assessments
+		// New assessments won't have meaningful unknown data since Unknown is now per-category
+		if (analysis.unknown && analysis.unknown !== "Mixed") {
+			detailedAssessment += `<strong>Legacy Unknown Data:</strong> <span class="assessment-rating ${unknownClass}">${analysis.unknown}</span><br>`
+		}
+
+		detailedAssessment += `</div>`
+
+		container.innerHTML = `
+			<div class="gemini-summary-card">
+				${detailedAssessment}
+			</div>
+		`
+
+		summaryCard = container.querySelector(".gemini-summary-card")
 	}
-	if (analysis.plotStructure) {
-		const displayValue = analysis.plotStructure === "Unknown" ? "Insufficient Data" : analysis.plotStructure
-		detailedAssessment += `<strong>Plot Structure:</strong> <span class="assessment-rating ${plotClass}">${displayValue}</span><br>`
-	}
-	if (analysis.worldBuilding) {
-		const displayValue = analysis.worldBuilding === "Unknown" ? "Insufficient Data" : analysis.worldBuilding
-		detailedAssessment += `<strong>World-Building:</strong> <span class="assessment-rating ${worldClass}">${displayValue}</span><br>`
-	}
-	if (analysis.themesAndMessages) {
-		const displayValue = analysis.themesAndMessages === "Unknown" ? "Insufficient Data" : analysis.themesAndMessages
-		detailedAssessment += `<strong>Themes & Messages:</strong> <span class="assessment-rating ${themesClass}">${displayValue}</span><br>`
-	}
-	if (analysis.writingStyle) {
-		const displayValue = analysis.writingStyle === "Unknown" ? "Insufficient Data" : analysis.writingStyle
-		detailedAssessment += `<strong>Writing Style:</strong> <span class="assessment-rating ${writingClass}">${displayValue}</span><br>`
-	}
-
-	// Only show the legacy Unknown section for backward compatibility with cached assessments
-	// New assessments won't have meaningful unknown data since Unknown is now per-category
-	if (analysis.unknown && analysis.unknown !== "Mixed") {
-		detailedAssessment += `<strong>Legacy Unknown Data:</strong> <span class="assessment-rating ${unknownClass}">${analysis.unknown}</span><br>`
-	}
-
-	detailedAssessment += `</div>`
-
-	container.innerHTML = `
-		<div class="gemini-summary-card">
-			${detailedAssessment}
-		</div>
-	`
 
 	// Find the title-wrap element within the card
 	const titleWrap = card.querySelector(".title-wrap")
@@ -2030,17 +2015,21 @@ function updateCardUI(card, analysis) {
 	// Create the trigger button as a separate element
 	const summaryTrigger = document.createElement("div")
 	summaryTrigger.className = "gemini-summary-trigger"
-	summaryTrigger.title = "Show AI Summary"
+	summaryTrigger.title = hasAnalysis ? "Show AI Summary" : "Analyze Novel"
 	summaryTrigger.innerHTML = `<span class="${iconConfig.iconClass}">${iconConfig.autoAwesomeIcon}</span>`
 
-	// Add toggle functionality after DOM insertion
-	const summaryCard = container.querySelector(".gemini-summary-card")
-	const toggles = summaryCard.querySelectorAll(".summary-toggle")
-
-	// Add click event to toggle lock state
+	// Add click event for dual-purpose functionality
 	let isLocked = false
 	summaryTrigger.addEventListener("click", function (event) {
 		event.stopPropagation()
+
+		// If no analysis (no cache), initiate analysis workflow
+		if (!hasAnalysis) {
+			processNovels()
+			return
+		}
+
+		// If analysis exists (has cache), execute existing toggle logic
 		isLocked = !isLocked
 		if (isLocked) {
 			summaryCard.classList.add("locked")
@@ -2049,21 +2038,25 @@ function updateCardUI(card, analysis) {
 		}
 	})
 
-	toggles.forEach((toggle) => {
-		toggle.addEventListener("click", function () {
-			const targetId = this.dataset.target
-			const content = summaryCard.querySelector(`#${targetId}`)
-			const isCollapsed = this.classList.contains("collapsed")
+	// Add toggle functionality after DOM insertion only if we have analysis
+	if (hasAnalysis) {
+		const toggles = summaryCard.querySelectorAll(".summary-toggle")
+		toggles.forEach((toggle) => {
+			toggle.addEventListener("click", function () {
+				const targetId = this.dataset.target
+				const content = summaryCard.querySelector(`#${targetId}`)
+				const isCollapsed = this.classList.contains("collapsed")
 
-			if (isCollapsed) {
-				this.classList.remove("collapsed")
-				content.classList.add("expanded")
-			} else {
-				this.classList.add("collapsed")
-				content.classList.remove("expanded")
-			}
+				if (isCollapsed) {
+					this.classList.remove("collapsed")
+					content.classList.add("expanded")
+				} else {
+					this.classList.add("collapsed")
+					content.classList.remove("expanded")
+				}
+			})
 		})
-	})
+	}
 
 	// Move trigger button to title-wrap and container (with summary card) to card
 	if (titleWrap) {
@@ -2586,8 +2579,9 @@ function displayCachedAssessments() {
 			}
 		}
 
+		let cachedAnalysis = null
 		if (serieId) {
-			let cachedAnalysis = getCachedAssessment(serieId)
+			cachedAnalysis = getCachedAssessment(serieId)
 			if (cachedAnalysis) {
 				// Ensure cached analysis has availableUsernames for color coding
 				if (!cachedAnalysis.availableUsernames) {
@@ -2595,9 +2589,13 @@ function displayCachedAssessments() {
 				}
 				// Ensure unknown field exists for backward compatibility
 				cachedAnalysis = schema_populateUnknownField(cachedAnalysis)
-				updateCardUI(card, cachedAnalysis)
 			}
 		}
+
+		// Always call updateCardUI - with cachedAnalysis if available, or null if not
+		// This ensures all novels get a trigger button (dual-purpose: analyze or show summary)
+		updateCardUI(card, cachedAnalysis)
+
 		// Mark as checked for cached status
 		card.dataset.geminiCachedChecked = "true"
 	})
@@ -2679,35 +2677,6 @@ async function processNovels() {
 			}
 		})
 	}
-}
-
-;// ./src/ui/components/buttons.js
-/**
- * Button Components
- * Handles floating action button and other UI buttons
- */
-
-
-
-/**
- * Create the floating analyze button
- */
-function createFloatingButton() {
-	if (document.getElementById("gemini-floating-analyze-btn")) {
-		return
-	} // Button already exists
-
-	const button = document.createElement("button")
-	button.id = "gemini-floating-analyze-btn"
-	button.title = "Analyze Next Novel"
-
-	// Use fallback icon if Material Icons are not available
-	const iconClass = window.__ICON_REPLACEMENTS__ ? "material-icons-fallback" : "material-icons"
-	const iconText = window.__ICON_REPLACEMENTS__ ? "📊" : "assessment"
-	button.innerHTML = `<span class="${iconClass}">${iconText}</span>`
-
-	button.addEventListener("click", processNovels)
-	document.body.appendChild(button)
 }
 
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
@@ -3053,7 +3022,6 @@ var _mobile_update = injectStylesIntoStyleTag_default()(_mobile/* default */.A, 
 
 
 
-
 // Import CSS styles
 
 
@@ -3077,7 +3045,6 @@ async function main() {
 
 	const observer = new MutationObserver(() => {
 		if (document.querySelector(".series-list")) {
-			createFloatingButton()
 			displayCachedAssessments()
 		}
 	})
