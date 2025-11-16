@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         WTR-Lab Novel Reviewer v1.8.4
+// @name         WTR-Lab Novel Reviewer v1.8.5
 // @namespace    http://tampermonkey.net/
-// @version      1.8.4
+// @version      1.8.5
 // @description  Comprehensive novel analysis for WTR Lab chapters using Gemini AI. Supports multiple API keys with smart rotation, dynamic model fetching, and background processing.
 // @author       MasuRii
 // @license      MIT

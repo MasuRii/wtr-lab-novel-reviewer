@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer [DEV]
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.4-dev.1763324254594
+// @version 1.8.5-dev.1763329486542
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you
@@ -1368,7 +1368,7 @@ function getRuntimeSettings() {
  * Get API key
  * @returns {string} Current API key
  */
-function getApiKey() {
+function settings_getApiKey() {
 	return runtimeSettings.apiKey
 }
 
@@ -1437,7 +1437,7 @@ function delay(ms) {
  * @param {string} message - Debug message
  * @param {*} data - Optional data to log
  */
-function debugLog(message, data) {
+function debug_debugLog(message, data) {
 	if (isDebugLoggingEnabled()) {
 		console.log(`[WTR-Lab Novel Reviewer Debug] ${message}`, data || "")
 	}
@@ -1464,7 +1464,7 @@ let mappingFailureNotified = false
  * @returns {Promise<boolean>} Success status
  */
 async function buildSerieIdMap() {
-	debugLog("Building serie_id mapping from __NEXT_DATA__")
+	debug_debugLog("Building serie_id mapping from __NEXT_DATA__")
 	const nextDataScript = document.querySelector('script[id="__NEXT_DATA__"]')
 	if (!nextDataScript) {
 		console.warn("__NEXT_DATA__ script not found. Unable to build serie_id mapping.")
@@ -1480,7 +1480,7 @@ async function buildSerieIdMap() {
 				}
 			})
 		}
-		debugLog(`Built serie_id map with ${serieIdMap.size} entries`)
+		debug_debugLog(`Built serie_id map with ${serieIdMap.size} entries`)
 
 		// Validate mapping was successful
 		if (serieIdMap.size === 0) {
@@ -1500,18 +1500,18 @@ async function buildSerieIdMap() {
  */
 async function validateAndBuildSerieIdMap() {
 	for (let attempt = 1; attempt <= MAPPING_RETRY_ATTEMPTS; attempt++) {
-		debugLog(`Attempting to build serie_id map (Attempt ${attempt}/${MAPPING_RETRY_ATTEMPTS})`)
+		debug_debugLog(`Attempting to build serie_id map (Attempt ${attempt}/${MAPPING_RETRY_ATTEMPTS})`)
 		const success = await buildSerieIdMap()
 
 		if (success) {
-			debugLog("Serie ID mapping validation: SUCCESS")
+			debug_debugLog("Serie ID mapping validation: SUCCESS")
 			return true
 		}
 
 		console.warn(`Serie ID mapping failed on attempt ${attempt}/${MAPPING_RETRY_ATTEMPTS}`)
 
 		if (attempt < MAPPING_RETRY_ATTEMPTS) {
-			debugLog(`Retrying in ${MAPPING_RETRY_DELAY}ms...`)
+			debug_debugLog(`Retrying in ${MAPPING_RETRY_DELAY}ms...`)
 			await delay(MAPPING_RETRY_DELAY)
 		}
 	}
@@ -1527,20 +1527,20 @@ async function validateAndBuildSerieIdMap() {
  * @param {string} serieId - The serie ID to validate
  * @returns {boolean} Validation result
  */
-function validateSerieIdMapping(rawId, serieId) {
+function mapping_validateSerieIdMapping(rawId, serieId) {
 	// Check if serieId is valid
 	if (!serieId || serieId === null || serieId === undefined || serieId === "") {
-		debugLog(`Mapping validation FAILED: Invalid serie_id for raw_id ${rawId}`)
+		debug_debugLog(`Mapping validation FAILED: Invalid serie_id for raw_id ${rawId}`)
 		return false
 	}
 
 	// Check if serieId is a valid format (should be numeric string)
 	if (!/^\d+$/.test(serieId.toString())) {
-		debugLog(`Mapping validation FAILED: Invalid serie_id format "${serieId}" for raw_id ${rawId}`)
+		debug_debugLog(`Mapping validation FAILED: Invalid serie_id format "${serieId}" for raw_id ${rawId}`)
 		return false
 	}
 
-	debugLog(`Mapping validation SUCCESS: raw_id ${rawId} -> serie_id ${serieId}`)
+	debug_debugLog(`Mapping validation SUCCESS: raw_id ${rawId} -> serie_id ${serieId}`)
 	return true
 }
 
@@ -1549,7 +1549,7 @@ function validateSerieIdMapping(rawId, serieId) {
  * @param {string} rawId - The raw ID
  * @returns {string|null} The mapped serie_id or null if not found
  */
-function getSerieIdForRawId(rawId) {
+function mapping_getSerieIdForRawId(rawId) {
 	return serieIdMap.get(rawId) || null
 }
 
@@ -1566,7 +1566,7 @@ function hasMappingForRawId(rawId) {
  * Get the size of the mapping
  * @returns {number} Number of mappings
  */
-function getMappingSize() {
+function mapping_getMappingSize() {
 	return serieIdMap.size
 }
 
@@ -1580,7 +1580,7 @@ function resetMappingFailureNotification() {
 /**
  * Show mapping failure notification to user
  */
-function showMappingFailureNotification() {
+function mapping_showMappingFailureNotification() {
 	if (mappingFailureNotified) {
 		return // Already notified, don't spam
 	}
@@ -1607,7 +1607,7 @@ function showMappingFailureNotification() {
 	document.body.appendChild(notification)
 
 	console.error("MAPPING FAILURE: User has been notified to refresh the page")
-	debugLog("Mapping failure notification displayed to user")
+	debug_debugLog("Mapping failure notification displayed to user")
 }
 
 ;// ./src/core/cache.js
@@ -1645,7 +1645,7 @@ function getCacheKey(serieId) {
  * @param {string} serieId - The serie ID
  * @returns {Object|null} Cached assessment or null if not found
  */
-function getCachedAssessment(serieId) {
+function cache_getCachedAssessment(serieId) {
 	if (!isLocalStorageAvailable()) {
 		return null
 	}
@@ -1852,7 +1852,7 @@ function setupConfig() {
  * Show API key modal
  * @returns {Promise<boolean>} Promise resolving to true if user saved, false if cancelled
  */
-function showApiKeyModal() {
+function panels_showApiKeyModal() {
 	return new Promise((resolve) => {
 		document.getElementById("gemini-api-key-modal-input").value = ""
 		document.getElementById("gemini-api-key-modal").style.display = "block"
@@ -2178,12 +2178,16 @@ function updateCardUI(card, analysis) {
 
 	// Add click event for dual-purpose functionality
 	let isLocked = false
-	summaryTrigger.addEventListener("click", function (event) {
+	summaryTrigger.addEventListener("click", async function (event) {
 		event.stopPropagation()
 
 		// If no analysis (no cache), initiate analysis workflow
 		if (!hasAnalysis) {
-			processNovels()
+			try {
+				await processSpecificNovel(card)
+			} catch (error) {
+				console.error("Error processing specific novel:", error)
+			}
 			return
 		}
 
@@ -2228,7 +2232,7 @@ function updateCardUI(card, analysis) {
  * @param {Element} card - The card element
  * @returns {Element} The overlay element
  */
-function addLoadingOverlay(card) {
+function cards_addLoadingOverlay(card) {
 	const overlay = document.createElement("div")
 	overlay.className = "gemini-processing-overlay"
 	overlay.textContent = "Analyzing..."
@@ -2280,32 +2284,32 @@ async function fetchReviews(serieId) {
 
 	// First, fetch page 0 to check if we have sufficient data
 	const url = `https://wtr-lab.com/api/review/get?serie_id=${serieId}&page=0&sort=most_liked`
-	debugLog(`Fetching reviews for serieId ${serieId}, Page 0 from: ${url}`)
+	debug_debugLog(`Fetching reviews for serieId ${serieId}, Page 0 from: ${url}`)
 
 	try {
 		const response = await fetch(url)
 		if (!response.ok) {
-			debugLog(`Review API response not OK for ${serieId}. Status: ${response.status}`)
+			debug_debugLog(`Review API response not OK for ${serieId}. Status: ${response.status}`)
 			return [] // Return empty array if first page fails
 		}
 		const data = await response.json()
-		debugLog(`Review API raw data for ${serieId}, Page 0:`, data)
+		debug_debugLog(`Review API raw data for ${serieId}, Page 0:`, data)
 
 		if (data.success && data.data && data.data.length > 0) {
 			allReviews = allReviews.concat(data.data)
-			debugLog(`Page 0 received ${data.data.length} reviews for ${serieId}`)
+			debug_debugLog(`Page 0 received ${data.data.length} reviews for ${serieId}`)
 
 			// Check if page 0 has sufficient data (>= 3 reviews with comments for good analysis)
 			const reviewsWithComments = data.data.filter((r) => r.comment)
 			if (reviewsWithComments.length >= 3) {
-				debugLog(
+				debug_debugLog(
 					`Page 0 has sufficient data (${reviewsWithComments.length} reviews with comments) for ${serieId} - stopping here`,
 				)
 				return allReviews
 			}
 		} else {
 			// No data in page 0, return empty
-			debugLog(`No reviews found in page 0 for ${serieId}`)
+			debug_debugLog(`No reviews found in page 0 for ${serieId}`)
 			return []
 		}
 	} catch (error) {
@@ -2316,16 +2320,16 @@ async function fetchReviews(serieId) {
 	// If we get here, page 0 has data but it's insufficient, so fetch remaining pages
 	for (let page = 1; page < MAX_PAGES; page++) {
 		const pageUrl = `https://wtr-lab.com/api/review/get?serie_id=${serieId}&page=${page}&sort=most_liked`
-		debugLog(`Fetching reviews for serieId ${serieId}, Page ${page} from: ${pageUrl}`)
+		debug_debugLog(`Fetching reviews for serieId ${serieId}, Page ${page} from: ${pageUrl}`)
 
 		try {
 			const response = await fetch(pageUrl)
 			if (!response.ok) {
-				debugLog(`Review API response not OK for ${serieId}. Status: ${response.status}`)
+				debug_debugLog(`Review API response not OK for ${serieId}. Status: ${response.status}`)
 				break // Stop fetching if API returns an error status
 			}
 			const data = await response.json()
-			debugLog(`Review API raw data for ${serieId}, Page ${page}:`, data)
+			debug_debugLog(`Review API raw data for ${serieId}, Page ${page}:`, data)
 
 			if (data.success && data.data && data.data.length > 0) {
 				allReviews = allReviews.concat(data.data)
@@ -2449,12 +2453,12 @@ function getGeminiAnalysis(novelsData) {
 		safetySettings: safetySettings,
 	})
 
-	debugLog("Gemini Prompt:", prompt)
+	debug_debugLog("Gemini Prompt:", prompt)
 
 	return new Promise((resolve, reject) => {
 		let retries = 0
 		const executeRequest = () => {
-			const apiKey = getApiKey()
+			const apiKey = settings_getApiKey()
 			const model = getGeminiModel()
 
 			GM_xmlhttpRequest({
@@ -2465,7 +2469,7 @@ function getGeminiAnalysis(novelsData) {
 				onload: function (response) {
 					try {
 						const apiResponse = JSON.parse(response.responseText)
-						debugLog("Gemini Raw Response:", apiResponse)
+						debug_debugLog("Gemini Raw Response:", apiResponse)
 
 						if (apiResponse.candidates && apiResponse.candidates.length > 0) {
 							const analyses = JSON.parse(apiResponse.candidates[0].content.parts[0].text)
@@ -2542,7 +2546,7 @@ function getGeminiAnalysis(novelsData) {
  * @param {Array} overlays - Array of overlay elements
  * @returns {Promise<Array>} Promise resolving to batch results
  */
-async function processBatch(batch, overlays) {
+async function batch_processBatch(batch, overlays) {
 	const novelsData = []
 	const batchResults = [] // Array to hold {card, analysis, overlay, serieId} for each processed novel
 
@@ -2557,12 +2561,12 @@ async function processBatch(batch, overlays) {
 		if (linkElement) {
 			rawId = linkElement.dataset.novelId
 			if (rawId) {
-				serieId = getSerieIdForRawId(rawId)
+				serieId = mapping_getSerieIdForRawId(rawId)
 				if (serieId) {
 					// Strict validation before proceeding
-					if (!validateSerieIdMapping(rawId, serieId)) {
+					if (!mapping_validateSerieIdMapping(rawId, serieId)) {
 						console.error(`PROCESSING HALTED: Invalid serie_id "${serieId}" for raw_id ${rawId}`)
-						showMappingFailureNotification()
+						mapping_showMappingFailureNotification()
 						// Remove all overlays and halt
 						overlays.forEach((o) => o && o.remove())
 						throw new Error("Invalid serie_id mapping detected")
@@ -2570,7 +2574,7 @@ async function processBatch(batch, overlays) {
 				} else {
 					// NO FALLBACK - strict mapping required
 					console.error(`PROCESSING HALTED: No serie_id mapping for raw_id ${rawId}`)
-					showMappingFailureNotification()
+					mapping_showMappingFailureNotification()
 					// Remove all overlays and halt
 					overlays.forEach((o) => o && o.remove())
 					throw new Error("No serie_id mapping found")
@@ -2581,7 +2585,7 @@ async function processBatch(batch, overlays) {
 		if (!serieId) {
 			// If no serieId after validation, halt processing
 			console.error("PROCESSING HALTED: Unable to obtain valid serie_id")
-			showMappingFailureNotification()
+			mapping_showMappingFailureNotification()
 			// Remove all overlays and halt
 			overlays.forEach((o) => o && o.remove())
 			throw new Error("No valid serie_id available")
@@ -2722,7 +2726,7 @@ function displayCachedAssessments() {
 		if (linkElement) {
 			rawId = linkElement.dataset.novelId
 			if (rawId) {
-				serieId = getSerieIdForRawId(rawId)
+				serieId = mapping_getSerieIdForRawId(rawId)
 			} else {
 				// Fallback: Extract from href or use raw_id directly
 				if (linkElement.href) {
@@ -2739,7 +2743,7 @@ function displayCachedAssessments() {
 
 		let cachedAnalysis = null
 		if (serieId) {
-			cachedAnalysis = getCachedAssessment(serieId)
+			cachedAnalysis = cache_getCachedAssessment(serieId)
 			if (cachedAnalysis) {
 				// Ensure cached analysis has availableUsernames for color coding
 				if (!cachedAnalysis.availableUsernames) {
@@ -2760,9 +2764,9 @@ function displayCachedAssessments() {
 }
 
 /**
- * Main function to process novels
+ * Main function to process novels (batch processing)
  */
-async function processNovels() {
+async function processAllNovels() {
 	if (!getApiKey()) {
 		const modalSet = await showApiKeyModal()
 		if (!modalSet) {
@@ -2828,6 +2832,79 @@ async function processNovels() {
 		}
 	} catch (error) {
 		console.error("An error occurred during single novel processing:", error)
+		overlays.forEach((overlay) => {
+			if (overlay) {
+				overlay.textContent = "Processing Failed"
+				setTimeout(() => overlay.remove(), 4000)
+			}
+		})
+	}
+}
+
+/**
+ * Process a specific novel card
+ * @param {Element} novelCardElement - The DOM element of the novel card to process
+ */
+async function processSpecificNovel(novelCardElement) {
+	if (!settings_getApiKey()) {
+		const modalSet = await panels_showApiKeyModal()
+		if (!modalSet) {
+			return // User cancelled or closed modal
+		}
+	}
+
+	// Validate serie_id mapping before proceeding
+	if (mapping_getMappingSize() === 0) {
+		console.error("PROCESSING HALTED: Serie ID map is empty. Cannot proceed with invalid mappings.")
+		debug_debugLog("Processing aborted: Serie ID map validation failed (empty map)")
+		mapping_showMappingFailureNotification()
+		return
+	}
+
+	// Extract novel data from the provided card element
+	const linkElement = novelCardElement.querySelector("a[data-novel-id]")
+	let serieId = null
+	let rawId = null
+
+	if (linkElement) {
+		rawId = linkElement.dataset.novelId
+		if (rawId) {
+			serieId = mapping_getSerieIdForRawId(rawId)
+
+			// Strict validation: verify the mapping is valid
+			if (serieId && !mapping_validateSerieIdMapping(rawId, serieId)) {
+				console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
+				debug_debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
+				mapping_showMappingFailureNotification()
+				return
+			}
+		} else {
+			// NO FALLBACK - strict mapping required
+			console.warn(`No serie_id mapping found for raw_id ${rawId}. Cannot process this novel.`)
+			debug_debugLog(`Cannot process novel with raw_id ${rawId}: No mapping in serieIdMap`)
+			return
+		}
+	}
+
+	// Check if novel is already cached
+	if (serieId && cache_getCachedAssessment(serieId)) {
+		debug_debugLog(`Novel with serie_id ${serieId} is already cached - no processing needed`)
+		return
+	}
+
+	// Process the single novel as a batch of size 1
+	const batch = [novelCardElement]
+	const overlays = batch.map((card) => cards_addLoadingOverlay(card))
+
+	try {
+		const result = await batch_processBatch(batch, overlays)
+
+		// Check if novel was cached
+		if (result.novelsData.length === 0) {
+			debug_debugLog("Novel was cached - no API call needed")
+		}
+	} catch (error) {
+		console.error("An error occurred during specific novel processing:", error)
 		overlays.forEach((overlay) => {
 			if (overlay) {
 				overlay.textContent = "Processing Failed"
@@ -3193,7 +3270,7 @@ async function main() {
 	const mappingSuccess = await validateAndBuildSerieIdMap()
 	if (!mappingSuccess) {
 		console.error("INITIALIZATION FAILED: Unable to build serie_id mapping after all retries")
-		showMappingFailureNotification()
+		mapping_showMappingFailureNotification()
 		// Continue with initialization but user will be notified
 	}
 
