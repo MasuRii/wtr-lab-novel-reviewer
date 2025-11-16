@@ -1,0 +1,98 @@
+const js = require("@eslint/js");
+const prettierConfig = require("eslint-config-prettier");
+const prettierPlugin = require("eslint-plugin-prettier");
+const importPlugin = require("eslint-plugin-import");
+
+module.exports = [
+  js.configs.recommended,
+  prettierConfig,
+  {
+    files: ["src/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: "module",
+      globals: {
+        // Tampermonkey/Greasemonkey globals
+        GM_xmlhttpRequest: "readonly",
+        GM_getValue: "readonly",
+        GM_setValue: "readonly",
+        GM_addStyle: "readonly",
+        GM_info: "readonly",
+        GM_registerMenuCommand: "readonly",
+        // Browser globals
+        console: "readonly",
+        document: "readonly",
+        window: "readonly",
+        navigator: "readonly",
+        alert: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        getComputedStyle: "readonly",
+        MutationObserver: "readonly",
+        sessionStorage: "readonly",
+        FileReader: "readonly",
+        Blob: "readonly",
+        URL: "readonly",
+        CustomEvent: "readonly",
+        require: "readonly",
+        module: "readonly",
+        jquery: "readonly",
+        error: "readonly",
+      },
+    },
+    plugins: {
+      prettier: prettierPlugin,
+      import: importPlugin,
+    },
+    rules: {
+      "prettier/prettier": "error",
+      "no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrors: "none",
+        },
+      ],
+      "no-undef": "off",
+      "no-console": "off",
+      "no-debugger": "error",
+      eqeqeq: "error",
+      curly: "error",
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-implicit-coercion": "error",
+      "no-constant-condition": "error",
+      "no-unreachable": "error",
+      "no-dupe-args": "error",
+      "no-dupe-keys": "error",
+      "no-duplicate-case": "error",
+      "valid-typeof": "error",
+      "no-func-assign": "error",
+      "no-unused-expressions": "error",
+      "no-self-assign": "error",
+      "no-sparse-arrays": "error",
+      "no-unexpected-multiline": "error",
+      "no-unsafe-negation": "error",
+      "use-isnan": "error",
+      "no-useless-escape": "error",
+      // Import/export rules to prevent build issues
+      "import/no-unresolved": "error",
+      "import/named": "error",
+      "import/default": "error",
+      "import/namespace": "error",
+      "import/no-extraneous-dependencies": "error",
+      "import/no-absolute-path": "error",
+      "import/no-dynamic-require": "error",
+      "import/no-self-import": "error",
+      "import/no-useless-path-segments": "error",
+    },
+    ignores: [
+      "node_modules/",
+      "dist/",
+      "build/",
+      "*.min.js",
+      "webpack.config.js",
+    ],
+  },
+];
