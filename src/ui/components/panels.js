@@ -12,24 +12,22 @@ import { saveConfig, getRuntimeSettings } from "../../config/settings.js"
 export function createSettingsPanel() {
 	const modelOptions = GEMINI_MODELS.map((model) => `<option value="${model}">${model}</option>`).join("")
 	const panelHTML = `
-		<div id="gemini-settings-panel">
-			<h3>Gemini Reviewer Settings</h3>
-			<label for="gemini-api-key-input">Gemini API Key:</label>
-			<input type="password" id="gemini-api-key-input">
-			<label for="gemini-batch-limit-input">Batch Limit:</label>
-			<input type="number" id="gemini-batch-limit-input" min="1">
-			<label for="gemini-model-select">Gemini Model:</label>
-			<select id="gemini-model-select">${modelOptions}</select>
-			<label for="gemini-debug-logging-input" style="display: flex; align-items: center;">
-				<input type="checkbox" id="gemini-debug-logging-input" style="width: auto; margin-right: 10px;">
-				Enable Debug Logging (Logs prompts and responses)
-			</label>
-			<div class="buttons">
-				<button id="gemini-settings-close">Close</button>
-				<button id="gemini-settings-save">Save</button>
-			</div>
+	<div id="gemini-settings-panel">
+		<h3>Gemini Reviewer Settings</h3>
+		<label for="gemini-api-key-input">Gemini API Key:</label>
+		<input type="password" id="gemini-api-key-input">
+		<label for="gemini-model-select">Gemini Model:</label>
+		<select id="gemini-model-select">${modelOptions}</select>
+		<label for="gemini-debug-logging-input" style="display: flex; align-items: center;">
+			<input type="checkbox" id="gemini-debug-logging-input" style="width: auto; margin-right: 10px;">
+			Enable Debug Logging (Logs prompts and responses)
+		</label>
+		<div class="buttons">
+			<button id="gemini-settings-close">Close</button>
+			<button id="gemini-settings-save">Save</button>
 		</div>
-	`
+	</div>
+`
 	document.body.insertAdjacentHTML("beforeend", panelHTML)
 }
 
@@ -68,7 +66,6 @@ export function setupConfig() {
 	GM_registerMenuCommand("Open Settings", () => {
 		const settings = getRuntimeSettings()
 		document.getElementById("gemini-api-key-input").value = settings.apiKey
-		document.getElementById("gemini-batch-limit-input").value = settings.batchLimit
 		document.getElementById("gemini-model-select").value = settings.geminiModel
 		document.getElementById("gemini-debug-logging-input").checked = settings.debugLoggingEnabled
 		document.getElementById("gemini-settings-panel").style.display = "block"
@@ -78,7 +75,6 @@ export function setupConfig() {
 	document.getElementById("gemini-settings-save").addEventListener("click", () => {
 		const newSettings = {
 			apiKey: document.getElementById("gemini-api-key-input").value,
-			batchLimit: parseInt(document.getElementById("gemini-batch-limit-input").value, 10),
 			geminiModel: document.getElementById("gemini-model-select").value,
 			debugLoggingEnabled: document.getElementById("gemini-debug-logging-input").checked,
 		}

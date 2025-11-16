@@ -52,6 +52,6 @@ export const PAGE_DELAY_MS = 100 // Short delay between pages to be polite
 export const FETCH_DELAY_MS = 300 // Wait 300ms between each fetch to be polite
 
 // Default configuration values
-export const DEFAULT_BATCH_LIMIT = 5
+export const DEFAULT_BATCH_LIMIT = 1
 export const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 export const DEFAULT_DEBUG_LOGGING_ENABLED = false

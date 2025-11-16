@@ -3,12 +3,11 @@
  * Handles loading and saving of user settings using GM_* functions
  */
 
-import { DEFAULT_BATCH_LIMIT, DEFAULT_GEMINI_MODEL, DEFAULT_DEBUG_LOGGING_ENABLED } from "./constants.js"
+import { DEFAULT_GEMINI_MODEL, DEFAULT_DEBUG_LOGGING_ENABLED } from "./constants.js"
 
 // Runtime settings state
 let runtimeSettings = {
 	apiKey: "",
-	batchLimit: DEFAULT_BATCH_LIMIT,
 	geminiModel: DEFAULT_GEMINI_MODEL,
 	debugLoggingEnabled: DEFAULT_DEBUG_LOGGING_ENABLED,
 }
@@ -18,7 +17,8 @@ let runtimeSettings = {
  */
 export function loadConfig() {
 	runtimeSettings.apiKey = GM_getValue("geminiApiKey", "")
-	runtimeSettings.batchLimit = parseInt(GM_getValue("batchLimit", DEFAULT_BATCH_LIMIT.toString()), 10)
+	// Load and ignore batchLimit from GM storage for backward compatibility
+	GM_getValue("batchLimit", "1")
 	runtimeSettings.geminiModel = GM_getValue("geminiModel", DEFAULT_GEMINI_MODEL)
 	runtimeSettings.debugLoggingEnabled = GM_getValue("debugLoggingEnabled", DEFAULT_DEBUG_LOGGING_ENABLED)
 }
@@ -29,7 +29,8 @@ export function loadConfig() {
  */
 export function saveConfig(newSettings) {
 	GM_setValue("geminiApiKey", newSettings.apiKey)
-	GM_setValue("batchLimit", newSettings.batchLimit)
+	// Remove batchLimit from persistent storage (batch processing decommissioned)
+	// Existing batchLimit values in GM storage will be ignored
 	GM_setValue("geminiModel", newSettings.geminiModel)
 	GM_setValue("debugLoggingEnabled", newSettings.debugLoggingEnabled)
 
@@ -60,23 +61,6 @@ export function getApiKey() {
 export function setApiKey(apiKey) {
 	runtimeSettings.apiKey = apiKey
 	GM_setValue("geminiApiKey", apiKey)
-}
-
-/**
- * Get batch limit
- * @returns {number} Current batch limit
- */
-export function getBatchLimit() {
-	return runtimeSettings.batchLimit
-}
-
-/**
- * Set batch limit
- * @param {number} batchLimit - Batch limit to set
- */
-export function setBatchLimit(batchLimit) {
-	runtimeSettings.batchLimit = batchLimit
-	GM_setValue("batchLimit", batchLimit)
 }
 
 /**

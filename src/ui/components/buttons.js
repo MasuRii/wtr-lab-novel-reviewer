@@ -3,7 +3,6 @@
  * Handles floating action button and other UI buttons
  */
 
-import { getBatchLimit } from "../../config/settings.js"
 import { processNovels } from "../../processing/workflow.js"
 
 /**
@@ -16,9 +15,7 @@ export function createFloatingButton() {
 
 	const button = document.createElement("button")
 	button.id = "gemini-floating-analyze-btn"
-	// Get batch limit with fallback in case the module isn't loaded yet
-	const batchLimit = typeof getBatchLimit === "function" ? getBatchLimit() : 10 // Default fallback
-	button.title = `Analyze Next Batch of Novels (${batchLimit})`
+	button.title = "Analyze Next Novel"
 
 	// Use fallback icon if Material Icons are not available
 	const iconClass = window.__ICON_REPLACEMENTS__ ? "material-icons-fallback" : "material-icons"

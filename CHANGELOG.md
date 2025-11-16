@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.2] - 2025-11-16
+
+### ❌ Removed
+- Complete decommissioning of configurable batch processing functionality
+- Removed batch size configuration option from settings panel UI
+- Eliminated `getBatchLimit()` and `setBatchLimit()` configuration functions
+- Removed dynamic batch size display from floating analysis button
+- Removed batch limit input field from user settings interface
+
+### 🔄 Changed
+- Hardcoded processing iteration size to permanently process 1 novel at a time
+- Updated processing workflow to use fixed batch size instead of configurable limit
+- Changed analysis button text from "Analyze Next Batch of Novels (X)" to "Analyze Next Novel"
+- Simplified settings panel by removing batch-related configuration options
+- Updated workflow logic to eliminate dynamic batch size dependencies
+
+### 🏗️ Refactored
+- Streamlined processing architecture by removing batch management complexity
+- Consolidated configuration management to focus on essential user settings
+- Simplified error handling patterns for single novel processing workflow
+- Reduced code complexity by eliminating batch size validation logic
+
+### 📊 Metrics
+- Configuration options reduced: 5 → 4 (-20% settings complexity)
+- Processing mode: Dynamic batch size → Fixed single novel (-100% variability)
+- UI settings fields: 4 → 3 (-25% interface complexity)
+- Build verification: All compilation targets successful (100% success rate)
+
 ## [1.8.1] - 2025-11-16
 
 ### 🏗️ Refactored

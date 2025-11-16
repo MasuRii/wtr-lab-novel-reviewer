@@ -1,9 +1,9 @@
 /**
  * Processing Workflow Management
- * Handles the main processing workflow including API key management and batch processing
+ * Handles the main processing workflow including API key management and single novel processing
  */
 
-import { getApiKey, getBatchLimit } from "../config/settings.js"
+import { getApiKey } from "../config/settings.js"
 import { showApiKeyModal } from "../ui/components/panels.js"
 import {
 	getSerieIdForRawId,
@@ -124,22 +124,21 @@ export async function processNovels() {
 		return
 	}
 
-	const batchLimit = getBatchLimit()
-	const batch = uncachedNovelCards.slice(0, batchLimit)
+	const batch = uncachedNovelCards.slice(0, 1)
 	const overlays = batch.map((card) => addLoadingOverlay(card))
 
 	try {
 		const result = await processBatch(batch, overlays)
 
-		// Check if all novels were cached
+		// Check if novel was cached
 		if (result.novelsData.length === 0) {
-			debugLog("All novels in batch were cached - no API call needed")
+			debugLog("Novel was cached - no API call needed")
 		}
 	} catch (error) {
-		console.error("An error occurred during batch processing:", error)
+		console.error("An error occurred during single novel processing:", error)
 		overlays.forEach((overlay) => {
 			if (overlay) {
-				overlay.textContent = "Batch Failed"
+				overlay.textContent = "Processing Failed"
 				setTimeout(() => overlay.remove(), 4000)
 			}
 		})

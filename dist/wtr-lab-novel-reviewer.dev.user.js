@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer [DEV]
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.1-dev.1763279042391
+// @version 1.8.2-dev.1763283379602
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you*
@@ -78,7 +78,7 @@ const PAGE_DELAY_MS = 100 // Short delay between pages to be polite
 const FETCH_DELAY_MS = 300 // Wait 300ms between each fetch to be polite
 
 // Default configuration values
-const DEFAULT_BATCH_LIMIT = 5
+const DEFAULT_BATCH_LIMIT = 1
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 const DEFAULT_DEBUG_LOGGING_ENABLED = false
 
@@ -93,7 +93,6 @@ const DEFAULT_DEBUG_LOGGING_ENABLED = false
 // Runtime settings state
 let runtimeSettings = {
 	apiKey: "",
-	batchLimit: DEFAULT_BATCH_LIMIT,
 	geminiModel: DEFAULT_GEMINI_MODEL,
 	debugLoggingEnabled: DEFAULT_DEBUG_LOGGING_ENABLED,
 }
@@ -103,7 +102,8 @@ let runtimeSettings = {
  */
 function loadConfig() {
 	runtimeSettings.apiKey = GM_getValue("geminiApiKey", "")
-	runtimeSettings.batchLimit = parseInt(GM_getValue("batchLimit", DEFAULT_BATCH_LIMIT.toString()), 10)
+	// Load and ignore batchLimit from GM storage for backward compatibility
+	GM_getValue("batchLimit", "1")
 	runtimeSettings.geminiModel = GM_getValue("geminiModel", DEFAULT_GEMINI_MODEL)
 	runtimeSettings.debugLoggingEnabled = GM_getValue("debugLoggingEnabled", DEFAULT_DEBUG_LOGGING_ENABLED)
 }
@@ -114,7 +114,8 @@ function loadConfig() {
  */
 function saveConfig(newSettings) {
 	GM_setValue("geminiApiKey", newSettings.apiKey)
-	GM_setValue("batchLimit", newSettings.batchLimit)
+	// Remove batchLimit from persistent storage (batch processing decommissioned)
+	// Existing batchLimit values in GM storage will be ignored
 	GM_setValue("geminiModel", newSettings.geminiModel)
 	GM_setValue("debugLoggingEnabled", newSettings.debugLoggingEnabled)
 
@@ -145,23 +146,6 @@ function getApiKey() {
 function setApiKey(apiKey) {
 	runtimeSettings.apiKey = apiKey
 	GM_setValue("geminiApiKey", apiKey)
-}
-
-/**
- * Get batch limit
- * @returns {number} Current batch limit
- */
-function getBatchLimit() {
-	return runtimeSettings.batchLimit
-}
-
-/**
- * Set batch limit
- * @param {number} batchLimit - Batch limit to set
- */
-function setBatchLimit(batchLimit) {
-	runtimeSettings.batchLimit = batchLimit
-	GM_setValue("batchLimit", batchLimit)
 }
 
 /**
@@ -963,24 +947,22 @@ function applyIconFallbacks() {
 function createSettingsPanel() {
 	const modelOptions = GEMINI_MODELS.map((model) => `<option value="${model}">${model}</option>`).join("")
 	const panelHTML = `
-		<div id="gemini-settings-panel">
-			<h3>Gemini Reviewer Settings</h3>
-			<label for="gemini-api-key-input">Gemini API Key:</label>
-			<input type="password" id="gemini-api-key-input">
-			<label for="gemini-batch-limit-input">Batch Limit:</label>
-			<input type="number" id="gemini-batch-limit-input" min="1">
-			<label for="gemini-model-select">Gemini Model:</label>
-			<select id="gemini-model-select">${modelOptions}</select>
-			<label for="gemini-debug-logging-input" style="display: flex; align-items: center;">
-				<input type="checkbox" id="gemini-debug-logging-input" style="width: auto; margin-right: 10px;">
-				Enable Debug Logging (Logs prompts and responses)
-			</label>
-			<div class="buttons">
-				<button id="gemini-settings-close">Close</button>
-				<button id="gemini-settings-save">Save</button>
-			</div>
+	<div id="gemini-settings-panel">
+		<h3>Gemini Reviewer Settings</h3>
+		<label for="gemini-api-key-input">Gemini API Key:</label>
+		<input type="password" id="gemini-api-key-input">
+		<label for="gemini-model-select">Gemini Model:</label>
+		<select id="gemini-model-select">${modelOptions}</select>
+		<label for="gemini-debug-logging-input" style="display: flex; align-items: center;">
+			<input type="checkbox" id="gemini-debug-logging-input" style="width: auto; margin-right: 10px;">
+			Enable Debug Logging (Logs prompts and responses)
+		</label>
+		<div class="buttons">
+			<button id="gemini-settings-close">Close</button>
+			<button id="gemini-settings-save">Save</button>
 		</div>
-	`
+	</div>
+`
 	document.body.insertAdjacentHTML("beforeend", panelHTML)
 }
 
@@ -1019,7 +1001,6 @@ function setupConfig() {
 	GM_registerMenuCommand("Open Settings", () => {
 		const settings = getRuntimeSettings()
 		document.getElementById("gemini-api-key-input").value = settings.apiKey
-		document.getElementById("gemini-batch-limit-input").value = settings.batchLimit
 		document.getElementById("gemini-model-select").value = settings.geminiModel
 		document.getElementById("gemini-debug-logging-input").checked = settings.debugLoggingEnabled
 		document.getElementById("gemini-settings-panel").style.display = "block"
@@ -1029,7 +1010,6 @@ function setupConfig() {
 	document.getElementById("gemini-settings-save").addEventListener("click", () => {
 		const newSettings = {
 			apiKey: document.getElementById("gemini-api-key-input").value,
-			batchLimit: parseInt(document.getElementById("gemini-batch-limit-input").value, 10),
 			geminiModel: document.getElementById("gemini-model-select").value,
 			debugLoggingEnabled: document.getElementById("gemini-debug-logging-input").checked,
 		}
@@ -1940,7 +1920,7 @@ async function processBatch(batch, overlays) {
 ;// ./src/processing/workflow.js
 /**
  * Processing Workflow Management
- * Handles the main processing workflow including API key management and batch processing
+ * Handles the main processing workflow including API key management and single novel processing
  */
 
 
@@ -2059,22 +2039,21 @@ async function processNovels() {
 		return
 	}
 
-	const batchLimit = getBatchLimit()
-	const batch = uncachedNovelCards.slice(0, batchLimit)
+	const batch = uncachedNovelCards.slice(0, 1)
 	const overlays = batch.map((card) => addLoadingOverlay(card))
 
 	try {
 		const result = await processBatch(batch, overlays)
 
-		// Check if all novels were cached
+		// Check if novel was cached
 		if (result.novelsData.length === 0) {
-			debugLog("All novels in batch were cached - no API call needed")
+			debugLog("Novel was cached - no API call needed")
 		}
 	} catch (error) {
-		console.error("An error occurred during batch processing:", error)
+		console.error("An error occurred during single novel processing:", error)
 		overlays.forEach((overlay) => {
 			if (overlay) {
-				overlay.textContent = "Batch Failed"
+				overlay.textContent = "Processing Failed"
 				setTimeout(() => overlay.remove(), 4000)
 			}
 		})
@@ -2089,7 +2068,6 @@ async function processNovels() {
 
 
 
-
 /**
  * Create the floating analyze button
  */
@@ -2100,9 +2078,7 @@ function createFloatingButton() {
 
 	const button = document.createElement("button")
 	button.id = "gemini-floating-analyze-btn"
-	// Get batch limit with fallback in case the module isn't loaded yet
-	const batchLimit = typeof getBatchLimit === "function" ? getBatchLimit() : 10 // Default fallback
-	button.title = `Analyze Next Batch of Novels (${batchLimit})`
+	button.title = "Analyze Next Novel"
 
 	// Use fallback icon if Material Icons are not available
 	const iconClass = window.__ICON_REPLACEMENTS__ ? "material-icons-fallback" : "material-icons"
