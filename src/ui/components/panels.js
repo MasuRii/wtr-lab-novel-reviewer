@@ -5,6 +5,7 @@
 
 import { GEMINI_MODELS } from "../../config/constants.js"
 import { saveConfig, getRuntimeSettings } from "../../config/settings.js"
+import { clearAllCachedAssessments } from "../../core/cache.js"
 
 /**
  * Create the settings panel
@@ -23,6 +24,7 @@ export function createSettingsPanel() {
 			Enable Debug Logging (Logs prompts and responses)
 		</label>
 		<div class="buttons">
+			<button id="clear-cache-button" style="background-color: #dc3545; margin-right: auto;">Clear Analyzed Novel Cache</button>
 			<button id="gemini-settings-close">Close</button>
 			<button id="gemini-settings-save">Save</button>
 		</div>
@@ -87,6 +89,22 @@ export function setupConfig() {
 	// Settings close button
 	document.getElementById("gemini-settings-close").addEventListener("click", () => {
 		document.getElementById("gemini-settings-panel").style.display = "none"
+	})
+
+	// Clear cache button
+	document.getElementById("clear-cache-button").addEventListener("click", () => {
+		const confirmed = confirm(
+			"Are you sure you want to clear the cache for all analyzed novels? This action cannot be undone.",
+		)
+		if (confirmed) {
+			const success = clearAllCachedAssessments()
+			if (success) {
+				alert("Cache cleared successfully. Refreshing page...")
+				window.location.reload()
+			} else {
+				alert("Failed to clear cache. Check console for details.")
+			}
+		}
 	})
 }
 

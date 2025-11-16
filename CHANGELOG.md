@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.8.4] - 2025-11-16
 
+### 🚀 Added
+- Implemented dedicated cache clearing functionality for analyzed novels with enhanced user experience
+- Added "Clear Analyzed Novel Cache" button to the "Gemini Reviewer Settings" panel for selective cache management
+- Created new `clearAllCachedAssessments()` function in `src/core/cache.js` with robust error handling
+- Implemented confirmation prompt before cache clearing to prevent accidental data loss
+- Added visual feedback during cache clearing process with success/failure notifications
+- Automatic UI refresh (`window.location.reload()`) after successful cache clearing to enable immediate re-analysis
+- Cache clearing specifically targets `geminiAssessment_*` prefixed keys, leaving site general cache unaffected
+
 ### 🔄 Changed
 - Relocated "Show AI Summary" button (`.gemini-summary-trigger`) into the top-right corner of the novel card title area (`.title-wrap`)
 - Updated DOM structure to move button as direct child of `.title-wrap` container while preserving existing event listeners

@@ -74,3 +74,52 @@ export function setCachedAssessment(serieId, assessment) {
 		}
 	}
 }
+
+/**
+ * Clear all cached assessments from localStorage
+ * @returns {boolean} True if successful, false otherwise
+ */
+export function clearAllCachedAssessments() {
+	if (!isLocalStorageAvailable()) {
+		return false
+	}
+
+	try {
+		const prefix = "geminiAssessment_"
+		let clearedCount = 0
+		let errorCount = 0
+
+		// Get all localStorage keys
+		const keys = []
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i)
+			if (key) {
+				keys.push(key)
+			}
+		}
+
+		// Iterate through all keys and remove those with the geminiAssessment_ prefix
+		for (const key of keys) {
+			if (key.startsWith(prefix)) {
+				try {
+					localStorage.removeItem(key)
+					clearedCount++
+				} catch (e) {
+					console.warn("Error removing cached assessment key:", key, e)
+					errorCount++
+				}
+			}
+		}
+
+		// Log summary
+		console.log(`Cleared ${clearedCount} cached assessments from localStorage`)
+		if (errorCount > 0) {
+			console.warn(`Encountered ${errorCount} errors while clearing cached assessments`)
+		}
+
+		return errorCount === 0
+	} catch (e) {
+		console.warn("Error clearing all cached assessments:", e)
+		return false
+	}
+}
