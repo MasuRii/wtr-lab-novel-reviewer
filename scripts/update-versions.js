@@ -25,8 +25,8 @@ const FILES_TO_UPDATE = [
 		file: "GreasyForkREADME.md",
 		patterns: [
 			{
-				search: /!\[Version\]\(https:\/\/img\.shields\.io\/badge\/version-[^)]+\)/g,
-				replace: `![Version](https://img.shields.io/badge/version-${VERSION_INFO.BADGE}-blue)`,
+				search: /!\[Version\]\(https:\/\/img\.shields\.io\/badge\/Version-[^)]+\)/g,
+				replace: `![Version](https://img.shields.io/badge/Version-${VERSION_INFO.BADGE}-blue.svg)`,
 			},
 		],
 	},
