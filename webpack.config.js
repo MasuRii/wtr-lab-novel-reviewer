@@ -12,7 +12,10 @@ const COMMON_META = {
   author: pkg.author,
   license: pkg.license,
   namespace: "http://tampermonkey.net/",
-  match: "https://wtr-lab.com/en/for-you*",
+  match: [
+    "https://wtr-lab.com/en/for-you",
+    "https://wtr-lab.com/en/for-you?*"
+  ],
   icon: "https://www.google.com/s2/favicons?sz=64&domain=wtr-lab.com",
   connect: [
     "generativelanguage.googleapis.com",

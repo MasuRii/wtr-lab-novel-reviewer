@@ -5,7 +5,8 @@
 // @description  Comprehensive novel analysis for WTR Lab chapters using Gemini AI. Supports multiple API keys with smart rotation, dynamic model fetching, and background processing.
 // @author       MasuRii
 // @license      MIT
-// @match        https://wtr-lab.com/en/for-you*
+// @match        https://wtr-lab.com/en/for-you
+// @match        https://wtr-lab.com/en/for-you?*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=wtr-lab.com
 // @connect      generativelanguage.googleapis.com
 // @grant        GM_setValue

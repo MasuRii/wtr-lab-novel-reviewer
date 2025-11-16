@@ -4,7 +4,8 @@
 // @version 1.8.4
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
-// @match https://wtr-lab.com/en/for-you*
+// @match https://wtr-lab.com/en/for-you
+// @match https://wtr-lab.com/en/for-you?*
 // @connect generativelanguage.googleapis.com
 // @connect fonts.googleapis.com
 // @grant GM_setValue

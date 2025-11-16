@@ -44,6 +44,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reverted incorrect positioning that had moved panel below card in desktop view
 - Maintained proper vertical centering and spacing for desktop layout while preserving mobile modal functionality
 
+### 🐛 Fixed
+- Resolved issue where userscript didn't match paginated pages (e.g., `?page=2`, `?page=6`)
+- Implemented explicit `@match` patterns to handle query parameters correctly
+- Changed from single pattern `https://wtr-lab.com/en/for-you*` to dual patterns:
+  - `https://wtr-lab.com/en/for-you` (base page)
+  - `https://wtr-lab.com/en/for-you?*` (pages with query parameters)
+- Updated both `src/header.js` and `webpack.config.js` with explicit match patterns
+- Ensured script runs only on `/en/for-you` and its paginated versions without affecting other site pages
+
 ### 🔧 Improved
 - Enhanced mobile user experience with centered modal overlay for AI Summary Panel
 - Improved desktop layout with more intuitive button placement within title area
