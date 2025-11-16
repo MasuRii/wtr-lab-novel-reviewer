@@ -1,0 +1,19 @@
+/* Base stylesheet for WTR-Lab Novel Reviewer */
+
+/* Keyframe animations */
+@keyframes slide-in-right {
+	from {
+		transform: translateX(100%);
+		opacity: 0;
+	}
+
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+/* Utility classes */
+.material-icons {
+	/* Inherit from vendor/_material-icons.css */
+}

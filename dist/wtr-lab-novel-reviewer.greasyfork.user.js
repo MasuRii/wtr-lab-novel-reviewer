@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.2
+// @version 1.8.3
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you*
@@ -22,6 +22,1162 @@
 
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ 41:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Mobile considerations */
+@media (width <= 768px) {
+	.gemini-summary-card {
+		width: 300px;
+		max-height: 400px;
+	}
+
+	#gemini-api-key-modal {
+		width: 90%;
+		padding: 15px;
+	}
+
+	#gemini-mapping-failure-notification {
+		width: calc(100% - 40px);
+		right: 20px;
+		left: 20px;
+	}
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 56:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+/* istanbul ignore next  */
+function setAttributesWithoutAttributes(styleElement) {
+  var nonce =  true ? __webpack_require__.nc : 0;
+  if (nonce) {
+    styleElement.setAttribute("nonce", nonce);
+  }
+}
+module.exports = setAttributesWithoutAttributes;
+
+/***/ }),
+
+/***/ 72:
+/***/ ((module) => {
+
+
+
+var stylesInDOM = [];
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+  for (var i = 0; i < stylesInDOM.length; i++) {
+    if (stylesInDOM[i].identifier === identifier) {
+      result = i;
+      break;
+    }
+  }
+  return result;
+}
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = options.base ? item[0] + options.base : item[0];
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var indexByIdentifier = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3],
+      supports: item[4],
+      layer: item[5]
+    };
+    if (indexByIdentifier !== -1) {
+      stylesInDOM[indexByIdentifier].references++;
+      stylesInDOM[indexByIdentifier].updater(obj);
+    } else {
+      var updater = addElementStyle(obj, options);
+      options.byIndex = i;
+      stylesInDOM.splice(i, 0, {
+        identifier: identifier,
+        updater: updater,
+        references: 1
+      });
+    }
+    identifiers.push(identifier);
+  }
+  return identifiers;
+}
+function addElementStyle(obj, options) {
+  var api = options.domAPI(options);
+  api.update(obj);
+  var updater = function updater(newObj) {
+    if (newObj) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap && newObj.supports === obj.supports && newObj.layer === obj.layer) {
+        return;
+      }
+      api.update(obj = newObj);
+    } else {
+      api.remove();
+    }
+  };
+  return updater;
+}
+module.exports = function (list, options) {
+  options = options || {};
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
+  return function update(newList) {
+    newList = newList || [];
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDOM[index].references--;
+    }
+    var newLastIdentifiers = modulesToDom(newList, options);
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+      var _index = getIndexByIdentifier(_identifier);
+      if (stylesInDOM[_index].references === 0) {
+        stylesInDOM[_index].updater();
+        stylesInDOM.splice(_index, 1);
+      }
+    }
+    lastIdentifiers = newLastIdentifiers;
+  };
+};
+
+/***/ }),
+
+/***/ 113:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function styleTagTransform(css, styleElement) {
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css;
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild);
+    }
+    styleElement.appendChild(document.createTextNode(css));
+  }
+}
+module.exports = styleTagTransform;
+
+/***/ }),
+
+/***/ 193:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Color coding for assessment ratings */
+.assessment-rating {
+	font-weight: bold;
+	padding: 2px 6px;
+	border-radius: 3px;
+}
+
+.assessment-rating.good {
+	color: #4caf50;
+	background-color: rgb(76 175 80 / 10%);
+}
+
+.assessment-rating.mixed {
+	color: #ff9800;
+	background-color: rgb(255 152 0 / 10%);
+}
+
+.assessment-rating.bad {
+	color: #f44336;
+	background-color: rgb(244 67 54 / 10%);
+}
+
+.assessment-rating.unknown {
+	color: #9e9e9e;
+	background-color: rgb(158 158 158 / 10%);
+	border: 1px solid rgb(158 158 158 / 30%);
+	font-style: italic;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 229:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Base stylesheet for WTR-Lab Novel Reviewer */
+
+/* Keyframe animations */
+@keyframes slide-in-right {
+	from {
+		transform: translateX(100%);
+		opacity: 0;
+	}
+
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+/* Utility classes */
+.material-icons {
+	/* Inherit from vendor/_material-icons.css */
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 279:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Mapping Failure Notification */
+#gemini-mapping-failure-notification {
+	position: fixed;
+	top: 80px;
+	right: 20px;
+	width: 400px;
+	background-color: #dc3545;
+	color: white;
+	border-radius: 8px;
+	box-shadow: 0 6px 16px rgb(0 0 0 / 40%);
+	z-index: 10000;
+	animation: slide-in-right 0.3s ease-out;
+}
+
+#gemini-mapping-failure-notification .notification-content {
+	display: flex;
+	align-items: flex-start;
+	padding: 16px;
+	gap: 12px;
+}
+
+#gemini-mapping-failure-notification .notification-icon {
+	font-size: 28px;
+	flex-shrink: 0;
+}
+
+#gemini-mapping-failure-notification .notification-text {
+	flex: 1;
+}
+
+#gemini-mapping-failure-notification .notification-text strong {
+	display: block;
+	font-size: 1.1em;
+	margin-bottom: 4px;
+}
+
+#gemini-mapping-failure-notification .notification-text p {
+	margin: 0;
+	font-size: 0.95em;
+	line-height: 1.4;
+}
+
+#gemini-mapping-failure-notification .notification-close {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 24px;
+	cursor: pointer;
+	padding: 0;
+	width: 24px;
+	height: 24px;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+#gemini-mapping-failure-notification .notification-close:hover {
+	opacity: 0.8;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 314:
+/***/ ((module) => {
+
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+module.exports = function (cssWithMappingToString) {
+  var list = [];
+
+  // return the list of modules as css string
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = "";
+      var needLayer = typeof item[5] !== "undefined";
+      if (item[4]) {
+        content += "@supports (".concat(item[4], ") {");
+      }
+      if (item[2]) {
+        content += "@media ".concat(item[2], " {");
+      }
+      if (needLayer) {
+        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
+      }
+      content += cssWithMappingToString(item);
+      if (needLayer) {
+        content += "}";
+      }
+      if (item[2]) {
+        content += "}";
+      }
+      if (item[4]) {
+        content += "}";
+      }
+      return content;
+    }).join("");
+  };
+
+  // import a list of modules into the list
+  list.i = function i(modules, media, dedupe, supports, layer) {
+    if (typeof modules === "string") {
+      modules = [[null, modules, undefined]];
+    }
+    var alreadyImportedModules = {};
+    if (dedupe) {
+      for (var k = 0; k < this.length; k++) {
+        var id = this[k][0];
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+    for (var _k = 0; _k < modules.length; _k++) {
+      var item = [].concat(modules[_k]);
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        continue;
+      }
+      if (typeof layer !== "undefined") {
+        if (typeof item[5] === "undefined") {
+          item[5] = layer;
+        } else {
+          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
+          item[5] = layer;
+        }
+      }
+      if (media) {
+        if (!item[2]) {
+          item[2] = media;
+        } else {
+          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
+          item[2] = media;
+        }
+      }
+      if (supports) {
+        if (!item[4]) {
+          item[4] = "".concat(supports);
+        } else {
+          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
+          item[4] = supports;
+        }
+      }
+      list.push(item);
+    }
+  };
+  return list;
+};
+
+/***/ }),
+
+/***/ 355:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Summary Icon and Tooltip */
+.gemini-summary-container {
+	/* This container is now a direct child of the .card element */
+}
+
+.gemini-summary-trigger {
+	position: absolute;
+	top: 50%;
+	right: -40px; /* Position outside the card container */
+	transform: translateY(-50%);
+	cursor: pointer;
+	z-index: 5;
+	background-color: rgb(0 0 0 / 60%);
+	border-radius: 50%;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+}
+
+.gemini-summary-trigger .material-icons {
+	font-size: 20px;
+}
+
+.gemini-summary-card {
+	display: none;
+	position: absolute;
+	top: 50%;
+	right: calc(100% + 15px); /* Positioned to the right of the novel card */
+	transform: translateY(-50%);
+	width: 400px;
+	max-height: 600px;
+	background-color: #212529;
+	border: 1px solid #495057;
+	border-radius: 8px;
+	padding: 15px;
+	z-index: 100;
+	color: #f8f9fa;
+	font-size: 0.9em;
+	box-shadow: 0 6px 12px rgb(0 0 0 / 40%);
+	overflow-y: auto;
+}
+
+.gemini-summary-card h4 {
+	margin: 0 0 8px;
+	color: #fff;
+	font-size: 1.1em;
+	font-weight: 600;
+}
+
+.gemini-summary-card h5 {
+	margin: 10px 0 5px;
+	color: #adb5bd;
+	font-size: 1em;
+	font-weight: 500;
+}
+
+.gemini-summary-card p {
+	margin: 0 0 10px;
+	line-height: 1.4;
+}
+
+.gemini-summary-card .assessment-section {
+	margin-bottom: 12px;
+}
+
+.gemini-summary-card .assessment-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.gemini-summary-card .assessment-item {
+	font-size: 0.85em;
+}
+
+.gemini-summary-card .summary-toggle {
+	cursor: pointer;
+	user-select: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background-color: rgb(255 255 255 / 5%);
+	padding: 8px 12px;
+	border-radius: 4px;
+	margin-bottom: 8px;
+	transition: background-color 0.2s ease;
+}
+
+.gemini-summary-card .summary-toggle:hover {
+	background-color: rgb(255 255 255 / 10%);
+}
+
+.gemini-summary-card .summary-toggle .toggle-icon {
+	font-size: 1.2em;
+	transition: transform 0.2s ease;
+}
+
+.gemini-summary-card .summary-toggle.collapsed .toggle-icon {
+	transform: rotate(-90deg);
+}
+
+.gemini-summary-card .summary-content {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.3s ease;
+	margin-bottom: 10px;
+}
+
+.gemini-summary-card .summary-content.expanded {
+	max-height: 200px; /* Scrolling enabled for long content */
+	overflow-y: auto;
+}
+
+.gemini-summary-card .summary-content p {
+	margin: 10px 0;
+	line-height: 1.4;
+	padding: 0 12px;
+}
+
+.gemini-summary-card.locked {
+	display: block;
+}
+
+.gemini-summary-card:hover:not(.locked),
+.gemini-summary-trigger:hover + .gemini-summary-card:not(.locked) {
+	display: block;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 483:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Material Icons font declarations */
+@font-face {
+	font-family: "Material Icons";
+	font-style: normal;
+	font-weight: 400;
+	src: url("https://fonts.gstatic.com/s/materialicons/v145/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Material Icons Outlined";
+	font-style: normal;
+	font-weight: 400;
+	src: url("https://fonts.gstatic.com/s/materialiconsoutlined/v110/gok-H7zzDkdnRel8-DQ6KAXJ69wP1tGnf4ZGhUcd.otf")
+		format("opentype");
+}
+
+@font-face {
+	font-family: "Material Icons Round";
+	font-style: normal;
+	font-weight: 400;
+	src: url("https://fonts.gstatic.com/s/materialiconsround/v109/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmM.otf")
+		format("opentype");
+}
+
+@font-face {
+	font-family: "Material Icons Sharp";
+	font-style: normal;
+	font-weight: 400;
+	src: url("https://fonts.gstatic.com/s/materialiconssharp/v110/oPWQ_lt5nv4pWNJpghLP75WiFR4kLh3kvmvS.otf")
+		format("opentype");
+}
+
+@font-face {
+	font-family: "Material Icons Two Tone";
+	font-style: normal;
+	font-weight: 400;
+	src: url("https://fonts.gstatic.com/s/materialiconstwotone/v113/hESh6WRmNCxEqUmNyh3JDeGxjVVyMg4tHGctNCu3.otf")
+		format("opentype");
+}
+
+/* Material Icons font declaration */
+.material-icons {
+	font-family: "Material Icons", sans-serif;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	overflow-wrap: normal;
+	direction: ltr;
+	font-feature-settings: "liga";
+	-webkit-font-smoothing: antialiased;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 532:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Floating Action Button */
+#gemini-floating-analyze-btn {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	width: 56px;
+	height: 56px;
+	background-color: #0d6efd;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4px 8px rgb(0 0 0 / 30%);
+	z-index: 9998;
+	transition: background-color 0.3s ease;
+}
+
+#gemini-floating-analyze-btn:hover {
+	background-color: #0b5ed7;
+}
+
+#gemini-floating-analyze-btn .material-icons {
+	font-size: 28px;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 538:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Settings Panel */
+#gemini-settings-panel {
+	display: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #2c3034;
+	color: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
+	z-index: 9999;
+	width: 400px;
+}
+
+#gemini-settings-panel h3 {
+	margin-top: 0;
+}
+
+#gemini-settings-panel label {
+	display: block;
+	margin: 10px 0 5px;
+}
+
+#gemini-settings-panel input,
+#gemini-settings-panel select {
+	width: 100%;
+	padding: 8px;
+	border-radius: 4px;
+	border: 1px solid #495057;
+	background-color: #212529;
+	color: white;
+	box-sizing: border-box;
+}
+
+#gemini-settings-panel .buttons {
+	margin-top: 20px;
+	text-align: right;
+}
+
+#gemini-settings-panel button {
+	margin-left: 10px;
+	padding: 8px 15px;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+}
+
+#gemini-settings-save {
+	background-color: #0d6efd;
+	color: white;
+}
+
+#gemini-settings-close {
+	background-color: #6c757d;
+	color: white;
+}
+
+/* API Key Modal */
+#gemini-api-key-modal {
+	display: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #2c3034;
+	color: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
+	z-index: 9999;
+	width: 500px;
+	max-height: 80vh;
+	overflow-y: auto;
+}
+
+#gemini-api-key-modal h3 {
+	margin-top: 0;
+	color: #fff;
+	text-align: center;
+}
+
+#gemini-api-key-modal .instructions {
+	margin-bottom: 20px;
+}
+
+#gemini-api-key-modal .instructions ol {
+	text-align: left;
+	padding-left: 20px;
+}
+
+#gemini-api-key-modal .instructions li {
+	margin-bottom: 8px;
+}
+
+#gemini-api-key-modal label {
+	display: block;
+	margin: 10px 0 5px;
+	font-weight: bold;
+}
+
+#gemini-api-key-modal input {
+	width: 100%;
+	padding: 8px;
+	border-radius: 4px;
+	border: 1px solid #495057;
+	background-color: #212529;
+	color: white;
+	box-sizing: border-box;
+}
+
+#gemini-api-key-modal .buttons {
+	margin-top: 20px;
+	text-align: center;
+}
+
+#gemini-api-key-modal button {
+	margin: 0 10px;
+	padding: 8px 15px;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	background-color: #0d6efd;
+	color: white;
+}
+
+#gemini-api-key-modal-close {
+	background-color: #6c757d;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 540:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ 601:
+/***/ ((module) => {
+
+
+
+module.exports = function (i) {
+  return i[1];
+};
+
+/***/ }),
+
+/***/ 659:
+/***/ ((module) => {
+
+
+
+var memo = {};
+
+/* istanbul ignore next  */
+function getTarget(target) {
+  if (typeof memo[target] === "undefined") {
+    var styleTarget = document.querySelector(target);
+
+    // Special case to return head of iframe instead of iframe itself
+    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+      try {
+        // This will throw an exception if access to iframe is blocked
+        // due to cross-origin restrictions
+        styleTarget = styleTarget.contentDocument.head;
+      } catch (e) {
+        // istanbul ignore next
+        styleTarget = null;
+      }
+    }
+    memo[target] = styleTarget;
+  }
+  return memo[target];
+}
+
+/* istanbul ignore next  */
+function insertBySelector(insert, style) {
+  var target = getTarget(insert);
+  if (!target) {
+    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+  }
+  target.appendChild(style);
+}
+module.exports = insertBySelector;
+
+/***/ }),
+
+/***/ 731:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Color-coded Username Styling */
+.username-color-coded {
+	background-color: rgb(255 255 255 / 10%);
+	padding: 1px 3px;
+	border-radius: 2px;
+	font-weight: 600;
+	transition: all 0.2s ease;
+	border: 1px solid transparent;
+}
+
+.username-color-coded:hover {
+	background-color: rgb(255 255 255 / 20%);
+	border-color: rgb(255 255 255 / 30%);
+	transform: translateY(-1px);
+}
+
+/* Anonymous user styling */
+.username-color-coded.anonymous {
+	background-color: rgb(149 165 166 / 20%);
+	color: #bdc3c7 !important;
+	border: 1px solid rgb(189 195 199 / 30%);
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 825:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function apply(styleElement, options, obj) {
+  var css = "";
+  if (obj.supports) {
+    css += "@supports (".concat(obj.supports, ") {");
+  }
+  if (obj.media) {
+    css += "@media ".concat(obj.media, " {");
+  }
+  var needLayer = typeof obj.layer !== "undefined";
+  if (needLayer) {
+    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
+  }
+  css += obj.css;
+  if (needLayer) {
+    css += "}";
+  }
+  if (obj.media) {
+    css += "}";
+  }
+  if (obj.supports) {
+    css += "}";
+  }
+  var sourceMap = obj.sourceMap;
+  if (sourceMap && typeof btoa !== "undefined") {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  }
+
+  // For old IE
+  /* istanbul ignore if  */
+  options.styleTagTransform(css, styleElement, options.options);
+}
+function removeStyleElement(styleElement) {
+  // istanbul ignore if
+  if (styleElement.parentNode === null) {
+    return false;
+  }
+  styleElement.parentNode.removeChild(styleElement);
+}
+
+/* istanbul ignore next  */
+function domAPI(options) {
+  if (typeof document === "undefined") {
+    return {
+      update: function update() {},
+      remove: function remove() {}
+    };
+  }
+  var styleElement = options.insertStyleElement(options);
+  return {
+    update: function update(obj) {
+      apply(styleElement, options, obj);
+    },
+    remove: function remove() {
+      removeStyleElement(styleElement);
+    }
+  };
+}
+module.exports = domAPI;
+
+/***/ }),
+
+/***/ 933:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Card modifications */
+.gemini-good-novel .card-body {
+	background-color: #2e462e !important;
+	border: 1px solid #578857;
+} /* Dark Green */
+
+.gemini-mixed-novel .card-body {
+	background-color: #46402e !important;
+	border: 1px solid #887a57;
+} /* Dark Yellow/Orange */
+
+.gemini-bad-novel .card-body {
+	background-color: #462e2e !important;
+	border: 1px solid #885757;
+} /* Dark Red */
+
+.gemini-processing-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgb(0 0 0 / 50%);
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.2em;
+	z-index: 10;
+	border-radius: var(--bs-card-inner-border-radius);
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			id: moduleId,
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/nonce */
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
 
 ;// ./src/config/constants.js
 /**
@@ -375,561 +1531,6 @@ function showMappingFailureNotification() {
 
 	console.error("MAPPING FAILURE: User has been notified to refresh the page")
 	debugLog("Mapping failure notification displayed to user")
-}
-
-;// ./src/utils/dom.js
-/**
- * DOM Utilities
- * Common DOM manipulation utilities
- */
-
-// Main application stylesheet content
-const MAIN_STYLES = `/* Main stylesheet for WTR-Lab Novel Reviewer */
-
-/* Card modifications */
-.gemini-good-novel .card-body {
-	background-color: #2e462e !important;
-	border: 1px solid #578857;
-} /* Dark Green */
-.gemini-mixed-novel .card-body {
-	background-color: #46402e !important;
-	border: 1px solid #887a57;
-} /* Dark Yellow/Orange */
-.gemini-bad-novel .card-body {
-	background-color: #462e2e !important;
-	border: 1px solid #885757;
-} /* Dark Red */
-.gemini-processing-overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: rgb(0 0 0 / 50%);
-	color: white;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 1.2em;
-	z-index: 10;
-	border-radius: var(--bs-card-inner-border-radius);
-}
-
-/* Color coding for assessment ratings */
-.assessment-rating {
-	font-weight: bold;
-	padding: 2px 6px;
-	border-radius: 3px;
-}
-
-.assessment-rating.good {
-	color: #4caf50;
-	background-color: rgb(76 175 80 / 10%);
-}
-
-.assessment-rating.mixed {
-	color: #ff9800;
-	background-color: rgb(255 152 0 / 10%);
-}
-
-.assessment-rating.bad {
-	color: #f44336;
-	background-color: rgb(244 67 54 / 10%);
-}
-
-.assessment-rating.unknown {
-	color: #9e9e9e;
-	background-color: rgb(158 158 158 / 10%);
-	border: 1px solid rgb(158 158 158 / 30%);
-	font-style: italic;
-}
-
-/* Summary Icon and Tooltip */
-.gemini-summary-container {
-	/* This container is now a direct child of the .card element */
-}
-
-.gemini-summary-trigger {
-	position: absolute;
-	top: 50%;
-	right: -40px; /* Position outside the card container */
-	transform: translateY(-50%);
-	cursor: pointer;
-	z-index: 5;
-	background-color: rgb(0 0 0 / 60%);
-	border-radius: 50%;
-	width: 32px;
-	height: 32px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: white;
-}
-
-.gemini-summary-trigger .material-icons {
-	font-size: 20px;
-}
-
-.gemini-summary-card {
-	display: none;
-	position: absolute;
-	top: 50%;
-	right: calc(100% + 15px); /* Positioned to the right of the novel card */
-	transform: translateY(-50%);
-	width: 400px;
-	max-height: 600px;
-	background-color: #212529;
-	border: 1px solid #495057;
-	border-radius: 8px;
-	padding: 15px;
-	z-index: 100;
-	color: #f8f9fa;
-	font-size: 0.9em;
-	box-shadow: 0 6px 12px rgb(0 0 0 / 40%);
-	overflow-y: auto;
-}
-
-.gemini-summary-card h4 {
-	margin: 0 0 8px;
-	color: #fff;
-	font-size: 1.1em;
-	font-weight: 600;
-}
-
-.gemini-summary-card h5 {
-	margin: 10px 0 5px;
-	color: #adb5bd;
-	font-size: 1em;
-	font-weight: 500;
-}
-
-.gemini-summary-card p {
-	margin: 0 0 10px;
-	line-height: 1.4;
-}
-
-.gemini-summary-card .assessment-section {
-	margin-bottom: 12px;
-}
-
-.gemini-summary-card .assessment-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-	gap: 8px;
-	margin-top: 8px;
-}
-
-.gemini-summary-card .assessment-item {
-	font-size: 0.85em;
-}
-
-.gemini-summary-card .summary-toggle {
-	cursor: pointer;
-	user-select: none;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	background-color: rgb(255 255 255 / 5%);
-	padding: 8px 12px;
-	border-radius: 4px;
-	margin-bottom: 8px;
-	transition: background-color 0.2s ease;
-}
-
-.gemini-summary-card .summary-toggle:hover {
-	background-color: rgb(255 255 255 / 10%);
-}
-
-.gemini-summary-card .summary-toggle .toggle-icon {
-	font-size: 1.2em;
-	transition: transform 0.2s ease;
-}
-
-.gemini-summary-card .summary-toggle.collapsed .toggle-icon {
-	transform: rotate(-90deg);
-}
-
-.gemini-summary-card .summary-content {
-	max-height: 0;
-	overflow: hidden;
-	transition: max-height 0.3s ease;
-	margin-bottom: 10px;
-}
-
-.gemini-summary-card .summary-content.expanded {
-	max-height: 200px; /* Scrolling enabled for long content */
-	overflow-y: auto;
-}
-
-.gemini-summary-card .summary-content p {
-	margin: 10px 0;
-	line-height: 1.4;
-	padding: 0 12px;
-}
-
-.gemini-summary-card.locked {
-	display: block;
-}
-
-.gemini-summary-card:hover:not(.locked),
-.gemini-summary-trigger:hover + .gemini-summary-card:not(.locked) {
-	display: block;
-}
-
-/* Color-coded Username Styling */
-.username-color-coded {
-	background-color: rgb(255 255 255 / 10%);
-	padding: 1px 3px;
-	border-radius: 2px;
-	font-weight: 600;
-	transition: all 0.2s ease;
-	border: 1px solid transparent;
-}
-
-.username-color-coded:hover {
-	background-color: rgb(255 255 255 / 20%);
-	border-color: rgb(255 255 255 / 30%);
-	transform: translateY(-1px);
-}
-
-/* Anonymous user styling */
-.username-color-coded.anonymous {
-	background-color: rgb(149 165 166 / 20%);
-	color: #bdc3c7 !important;
-	border: 1px solid rgb(189 195 199 / 30%);
-}
-
-/* Floating Action Button */
-#gemini-floating-analyze-btn {
-	position: fixed;
-	top: 20px;
-	right: 20px;
-	width: 56px;
-	height: 56px;
-	background-color: #0d6efd;
-	color: white;
-	border: none;
-	border-radius: 50%;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 4px 8px rgb(0 0 0 / 30%);
-	z-index: 9998;
-	transition: background-color 0.3s ease;
-}
-
-#gemini-floating-analyze-btn:hover {
-	background-color: #0b5ed7;
-}
-
-#gemini-floating-analyze-btn .material-icons {
-	font-size: 28px;
-}
-
-/* Settings Panel */
-#gemini-settings-panel {
-	display: none;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background-color: #2c3034;
-	color: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
-	z-index: 9999;
-	width: 400px;
-}
-
-#gemini-settings-panel h3 {
-	margin-top: 0;
-}
-
-#gemini-settings-panel label {
-	display: block;
-	margin: 10px 0 5px;
-}
-
-#gemini-settings-panel input,
-#gemini-settings-panel select {
-	width: 100%;
-	padding: 8px;
-	border-radius: 4px;
-	border: 1px solid #495057;
-	background-color: #212529;
-	color: white;
-	box-sizing: border-box;
-}
-
-#gemini-settings-panel .buttons {
-	margin-top: 20px;
-	text-align: right;
-}
-
-#gemini-settings-panel button {
-	margin-left: 10px;
-	padding: 8px 15px;
-	border-radius: 4px;
-	border: none;
-	cursor: pointer;
-}
-
-#gemini-settings-save {
-	background-color: #0d6efd;
-	color: white;
-}
-
-#gemini-settings-close {
-	background-color: #6c757d;
-	color: white;
-}
-
-/* API Key Modal */
-#gemini-api-key-modal {
-	display: none;
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background-color: #2c3034;
-	color: white;
-	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 5px 15px rgb(0 0 0 / 50%);
-	z-index: 9999;
-	width: 500px;
-	max-height: 80vh;
-	overflow-y: auto;
-}
-
-#gemini-api-key-modal h3 {
-	margin-top: 0;
-	color: #fff;
-	text-align: center;
-}
-
-#gemini-api-key-modal .instructions {
-	margin-bottom: 20px;
-}
-
-#gemini-api-key-modal .instructions ol {
-	text-align: left;
-	padding-left: 20px;
-}
-
-#gemini-api-key-modal .instructions li {
-	margin-bottom: 8px;
-}
-
-#gemini-api-key-modal label {
-	display: block;
-	margin: 10px 0 5px;
-	font-weight: bold;
-}
-
-#gemini-api-key-modal input {
-	width: 100%;
-	padding: 8px;
-	border-radius: 4px;
-	border: 1px solid #495057;
-	background-color: #212529;
-	color: white;
-	box-sizing: border-box;
-}
-
-#gemini-api-key-modal .buttons {
-	margin-top: 20px;
-	text-align: center;
-}
-
-#gemini-api-key-modal button {
-	margin: 0 10px;
-	padding: 8px 15px;
-	border-radius: 4px;
-	border: none;
-	cursor: pointer;
-	background-color: #0d6efd;
-	color: white;
-}
-
-#gemini-api-key-modal-close {
-	background-color: #6c757d;
-}
-
-/* Mapping Failure Notification */
-#gemini-mapping-failure-notification {
-	position: fixed;
-	top: 80px;
-	right: 20px;
-	width: 400px;
-	background-color: #dc3545;
-	color: white;
-	border-radius: 8px;
-	box-shadow: 0 6px 16px rgb(0 0 0 / 40%);
-	z-index: 10000;
-	animation: slide-in-right 0.3s ease-out;
-}
-
-#gemini-mapping-failure-notification .notification-content {
-	display: flex;
-	align-items: flex-start;
-	padding: 16px;
-	gap: 12px;
-}
-
-#gemini-mapping-failure-notification .notification-icon {
-	font-size: 28px;
-	flex-shrink: 0;
-}
-
-#gemini-mapping-failure-notification .notification-text {
-	flex: 1;
-}
-
-#gemini-mapping-failure-notification .notification-text strong {
-	display: block;
-	font-size: 1.1em;
-	margin-bottom: 4px;
-}
-
-#gemini-mapping-failure-notification .notification-text p {
-	margin: 0;
-	font-size: 0.95em;
-	line-height: 1.4;
-}
-
-#gemini-mapping-failure-notification .notification-close {
-	background: none;
-	border: none;
-	color: white;
-	font-size: 24px;
-	cursor: pointer;
-	padding: 0;
-	width: 24px;
-	height: 24px;
-	line-height: 1;
-	flex-shrink: 0;
-}
-
-#gemini-mapping-failure-notification .notification-close:hover {
-	opacity: 0.8;
-}
-
-@keyframes slide-in-right {
-	from {
-		transform: translateX(100%);
-		opacity: 0;
-	}
-
-	to {
-		transform: translateX(0);
-		opacity: 1;
-	}
-}
-
-/* Mobile considerations */
-@media (width <= 768px) {
-	.gemini-summary-card {
-		width: 300px;
-		max-height: 400px;
-	}
-
-	#gemini-api-key-modal {
-		width: 90%;
-		padding: 15px;
-	}
-
-	#gemini-mapping-failure-notification {
-		width: calc(100% - 40px);
-		right: 20px;
-		left: 20px;
-	}
-}
-
-/* Material Icons font declaration */
-.material-icons {
-	font-family: 'Material Icons';
-	font-weight: normal;
-	font-style: normal;
-	font-size: 24px;
-	line-height: 1;
-	letter-spacing: normal;
-	text-transform: none;
-	display: inline-block;
-	white-space: nowrap;
-	word-wrap: normal;
-	direction: ltr;
-	-webkit-font-feature-settings: 'liga';
-	-webkit-font-smoothing: antialiased;
-}`
-
-/**
- * Inject Material Icons stylesheet and main styles
- */
-function injectCSS() {
-	// Try to load Material Icons from Google Fonts first
-	const materialIconsUrl = "https://fonts.googleapis.com/icon?family=Material+Icons"
-
-	GM_xmlhttpRequest({
-		method: "GET",
-		url: materialIconsUrl,
-		headers: {
-			Accept: "text/css,*/*;q=0.1",
-		},
-		onload: function (response) {
-			if (response.status === 200 && response.responseText) {
-				console.log("Successfully loaded Material Icons from Google Fonts")
-				GM_addStyle(response.responseText)
-			} else {
-				console.warn("Failed to load Material Icons from Google Fonts, using fallback icons")
-				applyIconFallbacks()
-			}
-		},
-		onerror: function () {
-			console.warn("Failed to load Material Icons, using fallback icons")
-			applyIconFallbacks()
-		},
-	})
-
-	// Inject main application styles immediately
-	GM_addStyle(MAIN_STYLES)
-}
-
-/**
- * Apply fallback icons using Unicode characters
- */
-function applyIconFallbacks() {
-	// Replace Material Icons classes with Unicode fallbacks
-	const iconReplacements = {
-		auto_awesome: "⭐", // Star
-		assessment: "📊", // Bar chart
-		expand_more: "▼", // Down arrow
-		error: "⚠️", // Warning
-	}
-
-	// Add CSS to make icons consistent
-	const fallbackCSS = `
-.material-icons {
-	font-style: normal;
-	font-weight: normal;
-	font-size: 20px;
-	line-height: 1;
-	letter-spacing: normal;
-	text-transform: none;
-	display: inline-block;
-	white-space: nowrap;
-	word-wrap: normal;
-	direction: ltr;
-	-webkit-font-smoothing: antialiased;
-	vertical-align: middle;
-}
-`
-	GM_addStyle(fallbackCSS)
-
-	// Store replacements for use when creating elements
-	window.__ICON_REPLACEMENTS__ = iconReplacements
 }
 
 ;// ./src/ui/components/panels.js
@@ -2089,6 +2690,337 @@ function createFloatingButton() {
 	document.body.appendChild(button)
 }
 
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
+var injectStylesIntoStyleTag = __webpack_require__(72);
+var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
+var styleDomAPI = __webpack_require__(825);
+var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
+var insertBySelector = __webpack_require__(659);
+var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
+var setAttributesWithoutAttributes = __webpack_require__(56);
+var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
+var insertStyleElement = __webpack_require__(540);
+var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
+var styleTagTransform = __webpack_require__(113);
+var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/vendor/_material-icons.css
+var _material_icons = __webpack_require__(483);
+;// ./src/ui/styles/vendor/_material-icons.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (styleTagTransform_default());
+options.setAttributes = (setAttributesWithoutAttributes_default());
+options.insert = insertBySelector_default().bind(null, "head");
+options.domAPI = (styleDomAPI_default());
+options.insertStyleElement = (insertStyleElement_default());
+
+var update = injectStylesIntoStyleTag_default()(_material_icons/* default */.A, options);
+
+
+
+
+       /* harmony default export */ const vendor_material_icons = (_material_icons/* default */.A && _material_icons/* default */.A.locals ? _material_icons/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/_base.css
+var _base = __webpack_require__(229);
+;// ./src/ui/styles/_base.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _base_options = {};
+
+_base_options.styleTagTransform = (styleTagTransform_default());
+_base_options.setAttributes = (setAttributesWithoutAttributes_default());
+_base_options.insert = insertBySelector_default().bind(null, "head");
+_base_options.domAPI = (styleDomAPI_default());
+_base_options.insertStyleElement = (insertStyleElement_default());
+
+var _base_update = injectStylesIntoStyleTag_default()(_base/* default */.A, _base_options);
+
+
+
+
+       /* harmony default export */ const styles_base = (_base/* default */.A && _base/* default */.A.locals ? _base/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_cards.css
+var _cards = __webpack_require__(933);
+;// ./src/ui/styles/components/_cards.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _cards_options = {};
+
+_cards_options.styleTagTransform = (styleTagTransform_default());
+_cards_options.setAttributes = (setAttributesWithoutAttributes_default());
+_cards_options.insert = insertBySelector_default().bind(null, "head");
+_cards_options.domAPI = (styleDomAPI_default());
+_cards_options.insertStyleElement = (insertStyleElement_default());
+
+var _cards_update = injectStylesIntoStyleTag_default()(_cards/* default */.A, _cards_options);
+
+
+
+
+       /* harmony default export */ const components_cards = (_cards/* default */.A && _cards/* default */.A.locals ? _cards/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_ratings.css
+var _ratings = __webpack_require__(193);
+;// ./src/ui/styles/components/_ratings.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _ratings_options = {};
+
+_ratings_options.styleTagTransform = (styleTagTransform_default());
+_ratings_options.setAttributes = (setAttributesWithoutAttributes_default());
+_ratings_options.insert = insertBySelector_default().bind(null, "head");
+_ratings_options.domAPI = (styleDomAPI_default());
+_ratings_options.insertStyleElement = (insertStyleElement_default());
+
+var _ratings_update = injectStylesIntoStyleTag_default()(_ratings/* default */.A, _ratings_options);
+
+
+
+
+       /* harmony default export */ const components_ratings = (_ratings/* default */.A && _ratings/* default */.A.locals ? _ratings/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_summary.css
+var _summary = __webpack_require__(355);
+;// ./src/ui/styles/components/_summary.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _summary_options = {};
+
+_summary_options.styleTagTransform = (styleTagTransform_default());
+_summary_options.setAttributes = (setAttributesWithoutAttributes_default());
+_summary_options.insert = insertBySelector_default().bind(null, "head");
+_summary_options.domAPI = (styleDomAPI_default());
+_summary_options.insertStyleElement = (insertStyleElement_default());
+
+var _summary_update = injectStylesIntoStyleTag_default()(_summary/* default */.A, _summary_options);
+
+
+
+
+       /* harmony default export */ const components_summary = (_summary/* default */.A && _summary/* default */.A.locals ? _summary/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_username.css
+var _username = __webpack_require__(731);
+;// ./src/ui/styles/components/_username.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _username_options = {};
+
+_username_options.styleTagTransform = (styleTagTransform_default());
+_username_options.setAttributes = (setAttributesWithoutAttributes_default());
+_username_options.insert = insertBySelector_default().bind(null, "head");
+_username_options.domAPI = (styleDomAPI_default());
+_username_options.insertStyleElement = (insertStyleElement_default());
+
+var _username_update = injectStylesIntoStyleTag_default()(_username/* default */.A, _username_options);
+
+
+
+
+       /* harmony default export */ const components_username = (_username/* default */.A && _username/* default */.A.locals ? _username/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_buttons.css
+var _buttons = __webpack_require__(532);
+;// ./src/ui/styles/components/_buttons.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _buttons_options = {};
+
+_buttons_options.styleTagTransform = (styleTagTransform_default());
+_buttons_options.setAttributes = (setAttributesWithoutAttributes_default());
+_buttons_options.insert = insertBySelector_default().bind(null, "head");
+_buttons_options.domAPI = (styleDomAPI_default());
+_buttons_options.insertStyleElement = (insertStyleElement_default());
+
+var _buttons_update = injectStylesIntoStyleTag_default()(_buttons/* default */.A, _buttons_options);
+
+
+
+
+       /* harmony default export */ const components_buttons = (_buttons/* default */.A && _buttons/* default */.A.locals ? _buttons/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_panels.css
+var _panels = __webpack_require__(538);
+;// ./src/ui/styles/components/_panels.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _panels_options = {};
+
+_panels_options.styleTagTransform = (styleTagTransform_default());
+_panels_options.setAttributes = (setAttributesWithoutAttributes_default());
+_panels_options.insert = insertBySelector_default().bind(null, "head");
+_panels_options.domAPI = (styleDomAPI_default());
+_panels_options.insertStyleElement = (insertStyleElement_default());
+
+var _panels_update = injectStylesIntoStyleTag_default()(_panels/* default */.A, _panels_options);
+
+
+
+
+       /* harmony default export */ const components_panels = (_panels/* default */.A && _panels/* default */.A.locals ? _panels/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_notifications.css
+var _notifications = __webpack_require__(279);
+;// ./src/ui/styles/components/_notifications.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _notifications_options = {};
+
+_notifications_options.styleTagTransform = (styleTagTransform_default());
+_notifications_options.setAttributes = (setAttributesWithoutAttributes_default());
+_notifications_options.insert = insertBySelector_default().bind(null, "head");
+_notifications_options.domAPI = (styleDomAPI_default());
+_notifications_options.insertStyleElement = (insertStyleElement_default());
+
+var _notifications_update = injectStylesIntoStyleTag_default()(_notifications/* default */.A, _notifications_options);
+
+
+
+
+       /* harmony default export */ const components_notifications = (_notifications/* default */.A && _notifications/* default */.A.locals ? _notifications/* default */.A.locals : undefined);
+
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/ui/styles/components/_mobile.css
+var _mobile = __webpack_require__(41);
+;// ./src/ui/styles/components/_mobile.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var _mobile_options = {};
+
+_mobile_options.styleTagTransform = (styleTagTransform_default());
+_mobile_options.setAttributes = (setAttributesWithoutAttributes_default());
+_mobile_options.insert = insertBySelector_default().bind(null, "head");
+_mobile_options.domAPI = (styleDomAPI_default());
+_mobile_options.insertStyleElement = (insertStyleElement_default());
+
+var _mobile_update = injectStylesIntoStyleTag_default()(_mobile/* default */.A, _mobile_options);
+
+
+
+
+       /* harmony default export */ const components_mobile = (_mobile/* default */.A && _mobile/* default */.A.locals ? _mobile/* default */.A.locals : undefined);
+
+;// ./src/ui/styles/index.js
+/**
+ * UI Styles Module
+ * Main entry point for modular CSS stylesheets
+ * Imports all component styles in the correct order for proper cascading
+ */
+
+// Import vendor styles first
+
+
+// Import base styles
+
+
+// Import component styles
+
+
+
+
+
+
+
+
+
 ;// ./src/main.js
 /**
  * Main Initialization Module
@@ -2101,6 +3033,8 @@ function createFloatingButton() {
 
 
 
+
+// Import CSS styles
 
 
 /**
@@ -2117,7 +3051,6 @@ async function main() {
 		// Continue with initialization but user will be notified
 	}
 
-	injectCSS()
 	createSettingsPanel()
 	createApiKeyModal()
 	setupConfig()

@@ -5,11 +5,13 @@
 
 import { loadConfig } from "./config/settings.js"
 import { validateAndBuildSerieIdMap } from "./core/mapping.js"
-import { injectCSS } from "./utils/dom.js"
 import { createSettingsPanel, createApiKeyModal, setupConfig } from "./ui/components/panels.js"
 import { createFloatingButton } from "./ui/components/buttons.js"
 import { displayCachedAssessments } from "./processing/workflow.js"
 import { showMappingFailureNotification } from "./core/mapping.js"
+
+// Import CSS styles
+import "./ui/styles/index.js"
 
 /**
  * Main initialization function
@@ -25,7 +27,6 @@ export async function main() {
 		// Continue with initialization but user will be notified
 	}
 
-	injectCSS()
 	createSettingsPanel()
 	createApiKeyModal()
 	setupConfig()

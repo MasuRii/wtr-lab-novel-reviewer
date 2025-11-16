@@ -1,0 +1,58 @@
+/* Mapping Failure Notification */
+#gemini-mapping-failure-notification {
+	position: fixed;
+	top: 80px;
+	right: 20px;
+	width: 400px;
+	background-color: #dc3545;
+	color: white;
+	border-radius: 8px;
+	box-shadow: 0 6px 16px rgb(0 0 0 / 40%);
+	z-index: 10000;
+	animation: slide-in-right 0.3s ease-out;
+}
+
+#gemini-mapping-failure-notification .notification-content {
+	display: flex;
+	align-items: flex-start;
+	padding: 16px;
+	gap: 12px;
+}
+
+#gemini-mapping-failure-notification .notification-icon {
+	font-size: 28px;
+	flex-shrink: 0;
+}
+
+#gemini-mapping-failure-notification .notification-text {
+	flex: 1;
+}
+
+#gemini-mapping-failure-notification .notification-text strong {
+	display: block;
+	font-size: 1.1em;
+	margin-bottom: 4px;
+}
+
+#gemini-mapping-failure-notification .notification-text p {
+	margin: 0;
+	font-size: 0.95em;
+	line-height: 1.4;
+}
+
+#gemini-mapping-failure-notification .notification-close {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 24px;
+	cursor: pointer;
+	padding: 0;
+	width: 24px;
+	height: 24px;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+#gemini-mapping-failure-notification .notification-close:hover {
+	opacity: 0.8;
+}

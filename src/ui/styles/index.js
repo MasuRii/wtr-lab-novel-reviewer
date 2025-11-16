@@ -1,7 +1,21 @@
 /**
  * UI Styles Module
- * Re-exports main CSS stylesheet
+ * Main entry point for modular CSS stylesheets
+ * Imports all component styles in the correct order for proper cascading
  */
 
-// This module serves as a barrel export for styles
-// The actual CSS content is in main.css
+// Import vendor styles first
+import "./vendor/_material-icons.css"
+
+// Import base styles
+import "./_base.css"
+
+// Import component styles
+import "./components/_cards.css"
+import "./components/_ratings.css"
+import "./components/_summary.css"
+import "./components/_username.css"
+import "./components/_buttons.css"
+import "./components/_panels.css"
+import "./components/_notifications.css"
+import "./components/_mobile.css"
