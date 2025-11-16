@@ -73,9 +73,9 @@ export function displayCachedAssessments() {
 }
 
 /**
- * Main function to process novels
+ * Main function to process novels (batch processing)
  */
-export async function processNovels() {
+export async function processAllNovels() {
 	if (!getApiKey()) {
 		const modalSet = await showApiKeyModal()
 		if (!modalSet) {
@@ -141,6 +141,79 @@ export async function processNovels() {
 		}
 	} catch (error) {
 		console.error("An error occurred during single novel processing:", error)
+		overlays.forEach((overlay) => {
+			if (overlay) {
+				overlay.textContent = "Processing Failed"
+				setTimeout(() => overlay.remove(), 4000)
+			}
+		})
+	}
+}
+
+/**
+ * Process a specific novel card
+ * @param {Element} novelCardElement - The DOM element of the novel card to process
+ */
+export async function processSpecificNovel(novelCardElement) {
+	if (!getApiKey()) {
+		const modalSet = await showApiKeyModal()
+		if (!modalSet) {
+			return // User cancelled or closed modal
+		}
+	}
+
+	// Validate serie_id mapping before proceeding
+	if (getMappingSize() === 0) {
+		console.error("PROCESSING HALTED: Serie ID map is empty. Cannot proceed with invalid mappings.")
+		debugLog("Processing aborted: Serie ID map validation failed (empty map)")
+		showMappingFailureNotification()
+		return
+	}
+
+	// Extract novel data from the provided card element
+	const linkElement = novelCardElement.querySelector("a[data-novel-id]")
+	let serieId = null
+	let rawId = null
+
+	if (linkElement) {
+		rawId = linkElement.dataset.novelId
+		if (rawId) {
+			serieId = getSerieIdForRawId(rawId)
+
+			// Strict validation: verify the mapping is valid
+			if (serieId && !validateSerieIdMapping(rawId, serieId)) {
+				console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
+				debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
+				showMappingFailureNotification()
+				return
+			}
+		} else {
+			// NO FALLBACK - strict mapping required
+			console.warn(`No serie_id mapping found for raw_id ${rawId}. Cannot process this novel.`)
+			debugLog(`Cannot process novel with raw_id ${rawId}: No mapping in serieIdMap`)
+			return
+		}
+	}
+
+	// Check if novel is already cached
+	if (serieId && getCachedAssessment(serieId)) {
+		debugLog(`Novel with serie_id ${serieId} is already cached - no processing needed`)
+		return
+	}
+
+	// Process the single novel as a batch of size 1
+	const batch = [novelCardElement]
+	const overlays = batch.map((card) => addLoadingOverlay(card))
+
+	try {
+		const result = await processBatch(batch, overlays)
+
+		// Check if novel was cached
+		if (result.novelsData.length === 0) {
+			debugLog("Novel was cached - no API call needed")
+		}
+	} catch (error) {
+		console.error("An error occurred during specific novel processing:", error)
 		overlays.forEach((overlay) => {
 			if (overlay) {
 				overlay.textContent = "Processing Failed"

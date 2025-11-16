@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.5] - 2025-11-16
+
+### 🐛 Fixed
+- Resolved novel analysis targeting defect where clicking the analysis icon button incorrectly initiated analysis for the next unanalyzed novel instead of the specific novel associated with the clicked button
+- Fixed click event handler in `src/ui/components/cards.js` to pass the correct novel card element (`summaryCard`) to the analysis function
+- Modified `src/processing/workflow.js` to create new `processSpecificNovel(novelCardElement)` function that processes only the provided novel card element instead of defaulting to batch processing
+- Updated import statement and click handler to use novel-specific processing with proper error handling
+
+### 🔧 Improved
+- Enhanced version management system by updating regex pattern in `scripts/update-versions.js` to correctly match GreasyForkREADME.md version badge format (capitalized "Version" with .svg extension)
+- Ensured automatic version badge synchronization across both README.md and GreasyForkREADME.md files
+- Verified build system compatibility with updated version management workflow
+
 ## [1.8.4] - 2025-11-16
 
 ### 🚀 Added

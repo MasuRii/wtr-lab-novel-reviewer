@@ -4,7 +4,7 @@
  */
 
 import { colorCodeReviewSummary } from "../../utils/colors.js"
-import { processNovels } from "../../processing/workflow.js"
+import { processSpecificNovel } from "../../processing/workflow.js"
 
 /**
  * Get CSS class for rating
@@ -196,12 +196,16 @@ export function updateCardUI(card, analysis) {
 
 	// Add click event for dual-purpose functionality
 	let isLocked = false
-	summaryTrigger.addEventListener("click", function (event) {
+	summaryTrigger.addEventListener("click", async function (event) {
 		event.stopPropagation()
 
 		// If no analysis (no cache), initiate analysis workflow
 		if (!hasAnalysis) {
-			processNovels()
+			try {
+				await processSpecificNovel(card)
+			} catch (error) {
+				console.error("Error processing specific novel:", error)
+			}
 			return
 		}
 

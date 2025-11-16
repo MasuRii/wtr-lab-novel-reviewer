@@ -5,7 +5,7 @@
 A powerful userscript that uses Google's Gemini AI to analyze novels on WTR-Lab. Get comprehensive AI-powered assessments, color-coded review summaries, and detailed analysis across multiple categories without leaving the "For You" page.
 
 [![Install WTR-Lab Novel Reviewer](https://img.shields.io/badge/Install%20directly-Greasy%20Fork-green.svg)](https://greasyfork.org/en/scripts/555556)
-[![Version](https://img.shields.io/badge/Version-1.8.4-blue.svg)](#changelog)
+[![Version](https://img.shields.io/badge/Version-1.8.5-blue.svg)](#changelog)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](#license)
 
 ---
