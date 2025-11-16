@@ -1,18 +1,29 @@
 {
-  "name": "wtr-lab-term-inconsistency-finder",
-  "version": "5.3.7",
-  "description": "Finds term inconsistencies in WTR Lab chapters using Gemini AI. Supports multiple API keys with smart rotation, dynamic model fetching, and background processing.",
+  "name": "wtr-lab-novel-reviewer",
+  "version": "1.8.0",
+  "description": "Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.",
   "author": "MasuRii",
   "license": "MIT",
   "private": true,
   "main": "dist/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MasuRii/wtr-term-inconsistency-finder.git"
+    "url": "https://github.com/MasuRii/wtr-lab-novel-reviewer.git"
   },
   "bugs": {
-    "url": "https://github.com/MasuRii/wtr-term-inconsistency-finder/issues"
+    "url": "https://github.com/MasuRii/wtr-lab-novel-reviewer/issues"
   },
+  "keywords": [
+    "novel",
+    "analysis",
+    "gemini",
+    "ai",
+    "wtr-lab",
+    "literature",
+    "review",
+    "assessment",
+    "userscript"
+  ],
   "files": [
     "dist/",
     "src/"

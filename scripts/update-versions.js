@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/update-versions.js
-// Automated version synchronization for WTR Term Inconsistency Finder
+// Automated version synchronization for WTR-Lab Novel Reviewer
 
 const fs = require("fs");
 const path = require("path");
@@ -72,12 +72,12 @@ function updateFile(filePath, patterns) {
 
 function generateBanner() {
   const banner = `/**
- * WTR Term Inconsistency Finder v${VERSION_INFO.SEMANTIC}
+ * WTR-Lab Novel Reviewer v${VERSION_INFO.SEMANTIC}
  * Built: ${VERSION_INFO.BUILD_DATE} (${VERSION_INFO.BUILD_ENV})
- * 
- * A powerful userscript to find term inconsistencies in WTR Lab chapters
+ *
+ * A powerful userscript for comprehensive novel analysis of WTR Lab chapters
  * using Gemini AI with smart rotation and background processing.
- * 
+ *
  * @version ${VERSION_INFO.SEMANTIC}
  * @build ${VERSION_INFO.BUILD_ENV}
  * @date ${VERSION_INFO.BUILD_DATE}
@@ -91,13 +91,13 @@ function generateBanner() {
 
 function generateHeader() {
   const header = `// ==UserScript==
-// @name         WTR Term Inconsistency Finder v${VERSION_INFO.SEMANTIC}
+// @name         WTR-Lab Novel Reviewer v${VERSION_INFO.SEMANTIC}
 // @namespace    http://tampermonkey.net/
 // @version      ${VERSION_INFO.SEMANTIC}
-// @description  Finds term inconsistencies in WTR Lab chapters using Gemini AI. Supports multiple API keys with smart rotation, dynamic model fetching, and background processing.
+// @description  Comprehensive novel analysis for WTR Lab chapters using Gemini AI. Supports multiple API keys with smart rotation, dynamic model fetching, and background processing.
 // @author       MasuRii
 // @license      MIT
-// @match        https://wtr-lab.com/en/novel/*/*/*
+// @match        https://wtr-lab.com/en/for-you*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=wtr-lab.com
 // @connect      generativelanguage.googleapis.com
 // @grant        GM_setValue
@@ -106,8 +106,8 @@ function generateHeader() {
 // @grant        GM_registerMenuCommand
 // @grant        GM_xmlhttpRequest
 // @run-at       document-idle
-// @supportURL   https://github.com/MasuRii/wtr-term-inconsistency-finder/issues
-// @website      https://github.com/MasuRii/wtr-term-inconsistency-finder
+// @supportURL   https://github.com/wtr-lab/wtr-lab-novel-reviewer/issues
+// @website      https://github.com/wtr-lab/wtr-lab-novel-reviewer
 // ==/UserScript==
 
 `;
@@ -131,7 +131,7 @@ function checkVersion() {
 }
 
 // Main execution
-console.log("🔄 WTR Term Inconsistency Finder - Version Management");
+console.log("🔄 WTR-Lab Novel Reviewer - Version Management");
 console.log("=" .repeat(55));
 
 switch (command) {

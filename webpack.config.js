@@ -1,5 +1,5 @@
 // webpack.config.js
-// Multi-build configuration for WTR Term Inconsistency Finder
+// Multi-build configuration for WTR-Lab Novel Reviewer
 
 const path = require("path");
 const { UserscriptPlugin } = require("webpack-userscript");
@@ -12,7 +12,7 @@ const COMMON_META = {
   author: pkg.author,
   license: pkg.license,
   namespace: "http://tampermonkey.net/",
-  match: "https://wtr-lab.com/en/novel/*/*/*",
+  match: "https://wtr-lab.com/en/for-you*",
   icon: "https://www.google.com/s2/favicons?sz=64&domain=wtr-lab.com",
   connect: "generativelanguage.googleapis.com",
   grant: [
@@ -23,12 +23,12 @@ const COMMON_META = {
     "GM_xmlhttpRequest",
   ],
   "run-at": "document-idle",
-  supportURL: "https://github.com/MasuRii/wtr-term-inconsistency-finder/issues",
-  website: "https://github.com/MasuRii/wtr-term-inconsistency-finder",
+  supportURL: "https://github.com/MasuRii/wtr-lab-novel-reviewer/issues",
+  website: "https://github.com/MasuRii/wtr-lab-novel-reviewer",
 };
 
 // Script name constants
-const SCRIPT_NAME = "WTR Lab Term Inconsistency Finder";
+const SCRIPT_NAME = "WTR-Lab Novel Reviewer";
 const PACKAGE_NAME = pkg.name;
 
 // Build time for development builds
@@ -68,8 +68,8 @@ const performanceConfig = {
         ...COMMON_META,
         name: SCRIPT_NAME,
         version: getVersion("semantic"),
-        downloadURL: `https://raw.githubusercontent.com/MasuRii/wtr-term-inconsistency-finder/main/dist/${PACKAGE_NAME}.user.js`,
-        updateURL: `https://raw.githubusercontent.com/MasuRii/wtr-term-inconsistency-finder/main/dist/${PACKAGE_NAME}.user.js`,
+        downloadURL: `https://raw.githubusercontent.com/MasuRii/wtr-lab-novel-reviewer/main/dist/${PACKAGE_NAME}.user.js`,
+        updateURL: `https://raw.githubusercontent.com/MasuRii/wtr-lab-novel-reviewer/main/dist/${PACKAGE_NAME}.user.js`,
       },
       proxyScript: false,
     }),

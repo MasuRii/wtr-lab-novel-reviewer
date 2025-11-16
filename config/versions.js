@@ -1,5 +1,5 @@
 // config/versions.js
-// Centralized version management for WTR Term Inconsistency Finder
+// Centralized version management for WTR-Lab Novel Reviewer
 
 // Environment variable overrides with fallbacks
 const envVersion = process.env.WTR_VERSION || process.env.APP_VERSION;
