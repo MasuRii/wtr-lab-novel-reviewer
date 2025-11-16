@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer [DEV]
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.3-dev.1763298055758
+// @version 1.8.4-dev.1763319430522
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you*
@@ -42,8 +42,14 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 ___CSS_LOADER_EXPORT___.push([module.id, `/* Mobile considerations */
 @media (width <= 768px) {
 	.gemini-summary-card {
-		width: 300px;
-		max-height: 400px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 90%;
+		max-width: 400px;
+		max-height: 80vh;
+		z-index: 1000;
 	}
 
 	#gemini-api-key-modal {
@@ -467,7 +473,13 @@ module.exports = function (cssWithMappingToString) {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `/* Summary Icon and Tooltip */
+___CSS_LOADER_EXPORT___.push([module.id, `/* Title area styling to accommodate the summary trigger */
+.title-wrap {
+	position: relative;
+	padding-right: 45px; /* Space for the summary trigger button */
+}
+
+/* Summary Icon and Tooltip */
 .gemini-summary-container {
 	/* This container is now a direct child of the .card element */
 }
@@ -475,14 +487,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Summary Icon and Tooltip */
 .gemini-summary-trigger {
 	position: absolute;
 	top: 50%;
-	right: -40px; /* Position outside the card container */
+	right: 8px; /* Position within the title-wrap padding area */
 	transform: translateY(-50%);
 	cursor: pointer;
 	z-index: 5;
 	background-color: rgb(0 0 0 / 60%);
 	border-radius: 50%;
-	width: 32px;
-	height: 32px;
+	width: 28px;
+	height: 28px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -490,14 +502,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Summary Icon and Tooltip */
 }
 
 .gemini-summary-trigger .material-icons {
-	font-size: 20px;
+	font-size: 16px;
 }
 
 .gemini-summary-card {
 	display: none;
 	position: absolute;
 	top: 50%;
-	right: calc(100% + 15px); /* Positioned to the right of the novel card */
+	right: calc(100% + 15px);
 	transform: translateY(-50%);
 	width: 400px;
 	max-height: 600px;
@@ -2007,17 +2019,22 @@ function updateCardUI(card, analysis) {
 	detailedAssessment += `</div>`
 
 	container.innerHTML = `
-		<div class="gemini-summary-trigger" title="Show AI Summary">
-			<span class="${iconConfig.iconClass}">${iconConfig.autoAwesomeIcon}</span>
-		</div>
 		<div class="gemini-summary-card">
 			${detailedAssessment}
 		</div>
 	`
 
+	// Find the title-wrap element within the card
+	const titleWrap = card.querySelector(".title-wrap")
+
+	// Create the trigger button as a separate element
+	const summaryTrigger = document.createElement("div")
+	summaryTrigger.className = "gemini-summary-trigger"
+	summaryTrigger.title = "Show AI Summary"
+	summaryTrigger.innerHTML = `<span class="${iconConfig.iconClass}">${iconConfig.autoAwesomeIcon}</span>`
+
 	// Add toggle functionality after DOM insertion
 	const summaryCard = container.querySelector(".gemini-summary-card")
-	const summaryTrigger = container.querySelector(".gemini-summary-trigger")
 	const toggles = summaryCard.querySelectorAll(".summary-toggle")
 
 	// Add click event to toggle lock state
@@ -2048,7 +2065,10 @@ function updateCardUI(card, analysis) {
 		})
 	})
 
-	// Append directly to the card, which has position: relative
+	// Move trigger button to title-wrap and container (with summary card) to card
+	if (titleWrap) {
+		titleWrap.appendChild(summaryTrigger)
+	}
 	card.appendChild(container)
 }
 

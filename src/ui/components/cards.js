@@ -169,17 +169,22 @@ export function updateCardUI(card, analysis) {
 	detailedAssessment += `</div>`
 
 	container.innerHTML = `
-		<div class="gemini-summary-trigger" title="Show AI Summary">
-			<span class="${iconConfig.iconClass}">${iconConfig.autoAwesomeIcon}</span>
-		</div>
 		<div class="gemini-summary-card">
 			${detailedAssessment}
 		</div>
 	`
 
+	// Find the title-wrap element within the card
+	const titleWrap = card.querySelector(".title-wrap")
+
+	// Create the trigger button as a separate element
+	const summaryTrigger = document.createElement("div")
+	summaryTrigger.className = "gemini-summary-trigger"
+	summaryTrigger.title = "Show AI Summary"
+	summaryTrigger.innerHTML = `<span class="${iconConfig.iconClass}">${iconConfig.autoAwesomeIcon}</span>`
+
 	// Add toggle functionality after DOM insertion
 	const summaryCard = container.querySelector(".gemini-summary-card")
-	const summaryTrigger = container.querySelector(".gemini-summary-trigger")
 	const toggles = summaryCard.querySelectorAll(".summary-toggle")
 
 	// Add click event to toggle lock state
@@ -210,7 +215,10 @@ export function updateCardUI(card, analysis) {
 		})
 	})
 
-	// Append directly to the card, which has position: relative
+	// Move trigger button to title-wrap and container (with summary card) to card
+	if (titleWrap) {
+		titleWrap.appendChild(summaryTrigger)
+	}
 	card.appendChild(container)
 }
 

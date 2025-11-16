@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.4] - 2025-11-16
+
+### 🔄 Changed
+- Relocated "Show AI Summary" button (`.gemini-summary-trigger`) into the top-right corner of the novel card title area (`.title-wrap`)
+- Updated DOM structure to move button as direct child of `.title-wrap` container while preserving existing event listeners
+- Modified CSS positioning to place button absolutely within title area with proper vertical centering
+- Enhanced title area with `padding-right` to prevent text overlap with relocated button
+
+### 📱 Mobile
+- Implemented modal overlay behavior for AI Summary Panel (`.gemini-summary-card`) on screens ≤768px
+- Set summary card to `position: fixed` with viewport centering for better mobile usability
+- Added responsive dimensions with `width: 90%`, `max-width: 400px`, and `max-height: 80vh`
+- Increased z-index to ensure proper overlay positioning over other content
+
+### 🐛 Fixed
+- Corrected desktop positioning of AI Summary Panel (`.gemini-summary-card`) to restore original location (right of novel card)
+- Reverted incorrect positioning that had moved panel below card in desktop view
+- Maintained proper vertical centering and spacing for desktop layout while preserving mobile modal functionality
+
+### 🔧 Improved
+- Enhanced mobile user experience with centered modal overlay for AI Summary Panel
+- Improved desktop layout with more intuitive button placement within title area
+- Maintained backward compatibility with existing functionality and event handling
+- Ensured proper separation of concerns between trigger button and summary card positioning
+
 ## [1.8.3] - 2025-11-16
 
 ### 🏗️ Refactored

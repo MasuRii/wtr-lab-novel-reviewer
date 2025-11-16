@@ -1,6 +1,6 @@
 {
 	"name": "wtr-lab-novel-reviewer",
-	"version": "1.8.3",
+	"version": "1.8.4",
 	"description": "Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.",
 	"author": "MasuRii",
 	"license": "MIT",
