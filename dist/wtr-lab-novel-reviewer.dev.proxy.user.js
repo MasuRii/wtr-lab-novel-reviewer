@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer [DEV]
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.5-dev.1763329486542
+// @version 1.8.5-dev.1763495539471
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you
 // @match https://wtr-lab.com/en/for-you?*
+// @match https://wtr-lab.com/en/novel-finder*
 // @connect generativelanguage.googleapis.com
 // @connect fonts.googleapis.com
 // @grant GM_setValue

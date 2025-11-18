@@ -27,8 +27,19 @@ export async function buildSerieIdMap() {
 
 	try {
 		const nextData = JSON.parse(nextDataScript.textContent)
-		if (nextData.props?.pageProps?.list) {
-			nextData.props.pageProps.list.forEach((item) => {
+		const pageProps = nextData.props?.pageProps
+		const currentUrl = window.location.href
+
+		if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+			if (pageProps?.series) {
+				pageProps.series.forEach((item) => {
+					if (item.raw_id && item.id) {
+						serieIdMap.set(item.raw_id.toString(), item.id.toString())
+					}
+				})
+			}
+		} else if (pageProps?.list) {
+			pageProps.list.forEach((item) => {
 				if (item.raw_id && item.serie_id) {
 					serieIdMap.set(item.raw_id.toString(), item.serie_id.toString())
 				}
@@ -105,6 +116,14 @@ export function validateSerieIdMapping(rawId, serieId) {
  */
 export function getSerieIdForRawId(rawId) {
 	return serieIdMap.get(rawId) || null
+}
+
+/**
+ * Get the entire serieIdMap
+ * @returns {Map<string, string>} The serie ID map
+ */
+export function getSerieIdMap() {
+	return serieIdMap
 }
 
 /**

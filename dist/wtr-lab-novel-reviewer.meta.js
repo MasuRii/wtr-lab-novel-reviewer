@@ -6,6 +6,7 @@
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you
 // @match https://wtr-lab.com/en/for-you?*
+// @match https://wtr-lab.com/en/novel-finder*
 // @connect generativelanguage.googleapis.com
 // @connect fonts.googleapis.com
 // @downloadURL https://raw.githubusercontent.com/MasuRii/wtr-lab-novel-reviewer/main/dist/wtr-lab-novel-reviewer.user.js

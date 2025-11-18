@@ -14,7 +14,8 @@ const COMMON_META = {
   namespace: "http://tampermonkey.net/",
   match: [
     "https://wtr-lab.com/en/for-you",
-    "https://wtr-lab.com/en/for-you?*"
+    "https://wtr-lab.com/en/for-you?*",
+    "https://wtr-lab.com/en/novel-finder*"
   ],
   icon: "https://www.google.com/s2/favicons?sz=64&domain=wtr-lab.com",
   connect: [

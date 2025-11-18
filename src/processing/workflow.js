@@ -22,30 +22,27 @@ import { debugLog } from "../utils/debug.js"
  * Display cached assessments on the page
  */
 export function displayCachedAssessments() {
-	const novelCards = Array.from(
-		document.querySelectorAll(
-			".series-list > .card:not([data-gemini-processed]):not([data-gemini-cached-checked])",
-		),
-	)
+	const currentUrl = window.location.href
+	const cardSelector = currentUrl.includes("wtr-lab.com/en/novel-finder")
+		? ".card:not([data-gemini-processed]):not([data-gemini-cached-checked])"
+		: ".series-list > .card:not([data-gemini-processed]):not([data-gemini-cached-checked])"
+	const novelCards = Array.from(document.querySelectorAll(cardSelector))
 	novelCards.forEach((card) => {
-		const linkElement = card.querySelector("a[data-novel-id]")
+		const linkElement = card.querySelector("a.title")
 		let serieId = null
 		let rawId = null
 
 		if (linkElement) {
-			rawId = linkElement.dataset.novelId
-			if (rawId) {
-				serieId = getSerieIdForRawId(rawId)
-			} else {
-				// Fallback: Extract from href or use raw_id directly
-				if (linkElement.href) {
-					const match = linkElement.href.match(/\/novel\/(\d+)\//)
-					if (match && match[1]) {
-						serieId = match[1]
-					}
+			if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+				const match = linkElement.href.match(/\/novel\/(\d+)\//)
+				if (match && match[1]) {
+					rawId = match[1]
+					serieId = getSerieIdForRawId(rawId)
 				}
-				if (!serieId && rawId) {
-					serieId = rawId // Last resort
+			} else {
+				rawId = linkElement.dataset.novelId
+				if (rawId) {
+					serieId = getSerieIdForRawId(rawId)
 				}
 			}
 		}
@@ -91,32 +88,43 @@ export async function processAllNovels() {
 		return
 	}
 
-	const allNovelCards = Array.from(document.querySelectorAll(".series-list > .card"))
+	const currentUrl = window.location.href
+	const cardSelector = currentUrl.includes("wtr-lab.com/en/novel-finder") ? ".card" : ".series-list > .card"
+	const allNovelCards = Array.from(document.querySelectorAll(cardSelector))
 	const uncachedNovelCards = []
 
 	for (const card of allNovelCards) {
-		const linkElement = card.querySelector("a[data-novel-id]")
+		const linkElement = card.querySelector("a.title")
 		let serieId = null
 		let rawId = null
 
 		if (linkElement) {
-			rawId = linkElement.dataset.novelId
-			if (rawId) {
-				serieId = getSerieIdForRawId(rawId)
-
-				// Strict validation: verify the mapping is valid
-				if (serieId && !validateSerieIdMapping(rawId, serieId)) {
-					console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
-					debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
-					showMappingFailureNotification()
-					return
+			if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+				const match = linkElement.href.match(/\/novel\/(\d+)\//)
+				if (match && match[1]) {
+					rawId = match[1]
+					serieId = getSerieIdForRawId(rawId)
 				}
 			} else {
-				// NO FALLBACK - strict mapping required
-				console.warn(`No serie_id mapping found for raw_id ${rawId}. Skipping this novel.`)
-				debugLog(`Skipping novel with raw_id ${rawId}: No mapping in serieIdMap`)
-				continue
+				rawId = linkElement.dataset.novelId
+				if (rawId) {
+					serieId = getSerieIdForRawId(rawId)
+				}
 			}
+		}
+
+		// Strict validation: verify the mapping is valid
+		if (serieId && !validateSerieIdMapping(rawId, serieId)) {
+			console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
+			debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
+			showMappingFailureNotification()
+			return
+		}
+
+		if (!serieId) {
+			console.warn(`No serie_id mapping found for card. Skipping this novel.`)
+			debugLog(`Skipping novel: No mapping in serieIdMap`)
+			continue
 		}
 
 		if (serieId && !getCachedAssessment(serieId)) {
@@ -171,28 +179,38 @@ export async function processSpecificNovel(novelCardElement) {
 	}
 
 	// Extract novel data from the provided card element
-	const linkElement = novelCardElement.querySelector("a[data-novel-id]")
+	const linkElement = novelCardElement.querySelector("a.title")
 	let serieId = null
 	let rawId = null
+	const currentUrl = window.location.href
 
 	if (linkElement) {
-		rawId = linkElement.dataset.novelId
-		if (rawId) {
-			serieId = getSerieIdForRawId(rawId)
-
-			// Strict validation: verify the mapping is valid
-			if (serieId && !validateSerieIdMapping(rawId, serieId)) {
-				console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
-				debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
-				showMappingFailureNotification()
-				return
+		if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+			const match = linkElement.href.match(/\/novel\/(\d+)\//)
+			if (match && match[1]) {
+				rawId = match[1]
+				serieId = getSerieIdForRawId(rawId)
 			}
 		} else {
-			// NO FALLBACK - strict mapping required
-			console.warn(`No serie_id mapping found for raw_id ${rawId}. Cannot process this novel.`)
-			debugLog(`Cannot process novel with raw_id ${rawId}: No mapping in serieIdMap`)
-			return
+			rawId = linkElement.dataset.novelId
+			if (rawId) {
+				serieId = getSerieIdForRawId(rawId)
+			}
 		}
+	}
+
+	// Strict validation: verify the mapping is valid
+	if (serieId && !validateSerieIdMapping(rawId, serieId)) {
+		console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
+		debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
+		showMappingFailureNotification()
+		return
+	}
+
+	if (!serieId) {
+		console.warn(`No serie_id mapping found for card. Cannot process this novel.`)
+		debugLog(`Cannot process novel: No mapping in serieIdMap`)
+		return
 	}
 
 	// Check if novel is already cached

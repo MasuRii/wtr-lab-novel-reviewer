@@ -5,18 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.5] - 2025-11-16
+## [1.8.5] - 2025-11-18
+
+### 🚀 Added
+- Extended web scraping capabilities to support the `https://wtr-lab.com/en/novel-finder*` URL pattern.
+- Implemented a new card parser for the `novel-finder` page to handle its unique HTML structure.
+- Added the new URL pattern to the `@match` directives in `webpack.config.js` and `scripts/update-versions.js`.
+
+### 🔄 Changed
+- Updated the `serieIdMap` building logic in `src/core/mapping.js` to correctly parse the `__NEXT_DATA__` from both `for-you` and `novel-finder` pages.
+- Refactored the ID extraction logic in `src/processing/workflow.js` and `src/processing/batch.js` to be more robust and handle the different ID structures on both pages.
 
 ### 🐛 Fixed
-- Resolved novel analysis targeting defect where clicking the analysis icon button incorrectly initiated analysis for the next unanalyzed novel instead of the specific novel associated with the clicked button
-- Fixed click event handler in `src/ui/components/cards.js` to pass the correct novel card element (`summaryCard`) to the analysis function
-- Modified `src/processing/workflow.js` to create new `processSpecificNovel(novelCardElement)` function that processes only the provided novel card element instead of defaulting to batch processing
-- Updated import statement and click handler to use novel-specific processing with proper error handling
-
-### 🔧 Improved
-- Enhanced version management system by updating regex pattern in `scripts/update-versions.js` to correctly match GreasyForkREADME.md version badge format (capitalized "Version" with .svg extension)
-- Ensured automatic version badge synchronization across both README.md and GreasyForkREADME.md files
-- Verified build system compatibility with updated version management workflow
+- Corrected a critical bug where the wrong `serie_id` was used to fetch user reviews on the `novel-finder` page, ensuring accurate review data is used for analysis.
+- Resolved a regression that broke the functionality of the `https://wtr-lab.com/en/for-you` page.
+- Fixed multiple linting errors related to unused variables that were causing the build to fail.
 
 ## [1.8.4] - 2025-11-16
 
