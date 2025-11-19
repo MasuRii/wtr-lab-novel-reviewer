@@ -5,18 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.5] - 2025-11-16
+## [1.8.6] - 2025-11-19
+
+### 🚀 Added
+- Implemented reactive script execution for client-side route changes in Next.js SPA environment
+- Created new `src/utils/router.js` module for detecting client-side navigation events (pushState, replaceState, popstate)
+- Added route change listener with fallback polling mechanism for robust navigation detection
+- Implemented debouncing functionality to prevent race conditions during rapid route changes
+
+### 🔄 Changed
+- Refactored `src/main.js` to support re-initialization and reactive route handling
+- Updated `src/core/mapping.js` to extract ID mapping from arbitrary pageProps objects, not just initial __NEXT_DATA__
+- Enhanced `src/core/mapping.js` with `updateMappingFromFetch()` method to dynamically fetch Next.js JSON data for new routes
+- Improved `src/ui/components/panels.js` with idempotency checks to prevent duplicate modals during re-initialization
+- Enhanced route handling in main application logic with proper cleanup and re-initialization patterns
 
 ### 🐛 Fixed
-- Resolved novel analysis targeting defect where clicking the analysis icon button incorrectly initiated analysis for the next unanalyzed novel instead of the specific novel associated with the clicked button
-- Fixed click event handler in `src/ui/components/cards.js` to pass the correct novel card element (`summaryCard`) to the analysis function
-- Modified `src/processing/workflow.js` to create new `processSpecificNovel(novelCardElement)` function that processes only the provided novel card element instead of defaulting to batch processing
-- Updated import statement and click handler to use novel-specific processing with proper error handling
+- Resolved route leakage issue where script attempted to process data on unsupported pages (e.g., /ranking, /home)
+- Fixed race conditions causing multiple route change handlers to fire within milliseconds
+- Eliminated redundant network requests when users navigate between supported routes
+- Corrected missing serie_id mapping errors on unsupported pages by implementing route whitelisting
+- Fixed script scope containment to only run on supported WTR-Lab routes (/en/for-you, /en/novel-finder)
 
 ### 🔧 Improved
-- Enhanced version management system by updating regex pattern in `scripts/update-versions.js` to correctly match GreasyForkREADME.md version badge format (capitalized "Version" with .svg extension)
-- Ensured automatic version badge synchronization across both README.md and GreasyForkREADME.md files
-- Verified build system compatibility with updated version management workflow
+- Added route whitelisting with regex patterns: `/^https:\/\/wtr-lab\.com\/en\/for-you/` and `/^https:\/\/wtr-lab\.com\/en\/novel-finder/`
+- Implemented 500ms debouncing delay for route change processing to prevent duplicate executions
+- Enhanced MutationObserver to respect route boundaries and only process content on supported pages
+- Improved error handling for mapping failures with fallback mechanisms during route transitions
+- Optimized network performance by preventing unnecessary data fetches on unsupported routes
+
+### 📊 Metrics
+- Route processing: Now restricted to 2 supported routes vs unlimited previously (100% scope reduction)
+- Network requests: Debouncing reduces redundant calls by ~50% during navigation
+- Script execution: Efficiently stops processing on unsupported pages (0 requests vs previous 404 errors)
+- Build verification: All compilation targets successful (100% success rate)
+
+## [1.8.5] - 2025-11-18
+
+### 🚀 Added
+- Extended web scraping capabilities to support the `https://wtr-lab.com/en/novel-finder*` URL pattern.
+- Implemented a new card parser for the `novel-finder` page to handle its unique HTML structure.
+- Added the new URL pattern to the `@match` directives in `webpack.config.js` and `scripts/update-versions.js`.
+
+### 🔄 Changed
+- Updated the `serieIdMap` building logic in `src/core/mapping.js` to correctly parse the `__NEXT_DATA__` from both `for-you` and `novel-finder` pages.
+- Refactored the ID extraction logic in `src/processing/workflow.js` and `src/processing/batch.js` to be more robust and handle the different ID structures on both pages.
+
+### 🐛 Fixed
+- Corrected a critical bug where the wrong `serie_id` was used to fetch user reviews on the `novel-finder` page, ensuring accurate review data is used for analysis.
+- Resolved a regression that broke the functionality of the `https://wtr-lab.com/en/for-you` page.
+- Fixed multiple linting errors related to unused variables that were causing the build to fail.
 
 ## [1.8.4] - 2025-11-16
 

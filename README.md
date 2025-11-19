@@ -1,6 +1,6 @@
 # WTR-Lab Novel Reviewer
 
-[![Version](https://img.shields.io/badge/version-1.8.5-blue)](https://github.com/MasuRii/wtr-lab-novel-reviewer)
+[![Version](https://img.shields.io/badge/version-1.8.6-blue)](https://github.com/MasuRii/wtr-lab-novel-reviewer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#development-setup)
 [![Greasy Fork](https://img.shields.io/badge/Install-Greasy%20Fork-green.svg)](https://greasyfork.org/en/scripts/555556)
@@ -47,6 +47,8 @@ The WTR-Lab Novel Reviewer is an advanced userscript that enhances the WTR-Lab r
 - **Robust Error Handling**: Comprehensive retry logic with mapping validation safeguards
 - **Modern Architecture**: Built with Webpack, ESLint, Prettier, and automated version management
 - **Enhanced UI/UX**: Complete interface modernization with responsive design and mobile optimization
+- **Multi-Route Support**: Full support for both "For You" and "Novel Finder" pages with reactive route handling
+- **Reactive Navigation**: Automatic script re-initialization on client-side route changes in Next.js SPA environment
 
 ---
 
@@ -79,6 +81,9 @@ The WTR-Lab Novel Reviewer is an advanced userscript that enhances the WTR-Lab r
 - **Error Recovery**: Comprehensive retry logic with exponential backoff
 - **Debug Mode**: Optional detailed logging for troubleshooting
 - **Performance Optimization**: 60-80% reduction in unnecessary API calls through smart pagination
+- **Multi-Route Support**: Full integration with "For You" and "Novel Finder" pages
+- **Reactive Execution**: Automatic script re-initialization on client-side route changes
+- **Route Whitelisting**: Prevents processing on unsupported pages for better performance
 
 ### 📱 Mobile Enhancements
 - **Modal Overlay**: AI Summary Panel displays as fixed overlay on mobile screens (≤768px)
@@ -95,7 +100,8 @@ The WTR-Lab Novel Reviewer is an advanced userscript that enhances the WTR-Lab r
 2. **Get a Gemini API Key** from [Google AI Studio](https://aistudio.google.com/app/apikey)
 3. **Install the script** from [Greasy Fork](https://greasyfork.org/en/scripts/555556)
 4. **Configure API key** in the settings panel
-5. **Navigate to WTR-Lab "For You" page** and click the analysis button on individual novel cards
+5. **Navigate to WTR-Lab "For You" or "Novel Finder" page** and click the analysis button on individual novel cards
+6. **Enjoy seamless navigation** - the script automatically handles client-side route changes
 
 ### For Developers
 ```bash
@@ -195,11 +201,12 @@ WTR_BUILD_DATE=2025-11-16  # Build date override
 ## 💻 Usage Guide
 
 ### Basic Usage
-1. **Navigate** to [WTR-Lab "For You" page](https://wtr-lab.com/en/for-you)
+1. **Navigate** to [WTR-Lab "For You" page](https://wtr-lab.com/en/for-you) or [WTR-Lab "Novel Finder" page](https://wtr-lab.com/en/novel-finder)
 2. **Click** the analysis button (📊) in the top-right corner of novel card titles
 3. **View** AI assessments displayed as colored icons on novel cards
 4. **Hover** over the ✨ icon to see detailed analysis summaries
-5. **Clear Cache** using the dedicated button in settings when needed
+5. **Navigate between pages** and enjoy seamless script re-initialization
+6. **Clear Cache** using the dedicated button in settings when needed
 
 ### Enhanced Features
 
@@ -401,7 +408,9 @@ wtr-lab-novel-reviewer/
 │       ├── colors.js
 │       ├── dom.js
 │       ├── delay.js
-│       └── debug.js
+│       ├── debug.js
+│       ├── router.js          # Route change detection and reactive handling
+│       └── string.js          # String utility functions
 ├── dist/                      # Build output
 ├── docs/                      # Documentation
 ├── .prettierrc.json          # Code formatting rules
@@ -439,6 +448,8 @@ wtr-lab-novel-reviewer/
 - UI manipulation and styling
 - Caching and storage management
 - Error handling and retry logic
+- Reactive route handling and navigation detection
+- Multi-route support for "For You" and "Novel Finder" pages
 ```
 
 #### Build Configuration
@@ -553,6 +564,7 @@ console.log('[WTR-Lab Novel Reviewer Debug]', message, data);
 2. Check network connectivity
 3. Enable debug logging for detailed error information
 4. Try refreshing the page and analyzing again
+5. Ensure you're on supported pages (For You or Novel Finder)
 
 #### "Serie ID Mapping Failed" Notification
 **Symptoms**: Mapping validation fails
@@ -575,6 +587,10 @@ console.log('[WTR-Lab Novel Reviewer Debug]', message, data);
 1. Use `gemini-2.5-flash` model for faster processing
 2. Clear cache periodically to prevent data buildup
 3. Check browser console for debug information
+4. Route whitelisting prevents unnecessary API calls on unsupported pages
+5. Debouncing reduces redundant calls during navigation (500ms delay)
+4. Route whitelisting prevents unnecessary API calls on unsupported pages
+5. Debouncing reduces redundant calls during navigation (500ms delay)
 
 ### Debug Information
 Enable debug logging to access:
@@ -671,11 +687,19 @@ When reporting bugs, include:
 
 #### 1. Serie ID Mapping System
 ```javascript
-// Robust mapping validation
+// Robust mapping validation with reactive support
 async function validateAndBuildSerieIdMap() {
   // Validates and builds mapping from __NEXT_DATA__
   // Implements retry logic with exponential backoff
   // Provides user feedback on mapping failures
+  // Supports dynamic mapping updates on route changes
+}
+
+// Dynamic mapping update for new routes
+async function updateMappingFromFetch() {
+  // Fetches Next.js JSON data for new routes
+  // Updates mapping for novel-finder pages
+  // Maintains consistency across navigation
 }
 ```
 
@@ -875,6 +899,19 @@ function validateSerieIdMapping(rawId, serieId) {
 ## 📝 Changelog
 
 All notable changes to this project are documented in [CHANGELOG.md](CHANGELOG.md).
+
+### Recent Changes (v1.8.6)
+- 🚀 **Reactive Execution**: Implemented reactive script execution for client-side route changes in Next.js SPA environment
+- 🛣️ **Novel Finder Support**: Extended full support to `https://wtr-lab.com/en/novel-finder*` pages with dedicated card parser
+- 🔄 **Route Handling**: Added robust route change detection with debouncing (500ms) to prevent race conditions
+- 🛡️ **Route Whitelisting**: Implemented scope restrictions to prevent processing on unsupported pages
+- 🐛 **Bug Fixes**: Resolved route leakage issues and fixed critical serie_id mapping bug on novel-finder pages
+
+### Recent Changes (v1.8.5)
+- 🚀 **Page Support**: Extended web scraping capabilities to support `https://wtr-lab.com/en/novel-finder*` URL pattern
+- 🏗️ **Parser Integration**: Implemented new card parser for novel-finder page's unique HTML structure
+- 🐛 **Critical Fix**: Corrected wrong serie_id usage ensuring accurate review data for novel-finder analysis
+- 🔧 **Build Fix**: Resolved multiple linting errors that were causing build failures
 
 ### Recent Changes (v1.8.4)
 - 🚀 **Cache Management**: Implemented dedicated cache clearing functionality with user confirmation

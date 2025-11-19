@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.5
+// @version 1.8.6
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you
 // @match https://wtr-lab.com/en/for-you?*
+// @match https://wtr-lab.com/en/novel-finder*
 // @connect generativelanguage.googleapis.com
 // @connect fonts.googleapis.com
 // @grant GM_setValue
@@ -1315,6 +1316,9 @@ const DEFAULT_BATCH_LIMIT = 1
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 const DEFAULT_DEBUG_LOGGING_ENABLED = false
 
+// Supported routes for script execution (Regex patterns)
+const SUPPORTED_ROUTES = (/* unused pure expression or super */ null && ([/^https:\/\/wtr-lab\.com\/en\/for-you/, /^https:\/\/wtr-lab\.com\/en\/novel-finder/]))
+
 ;// ./src/config/settings.js
 /**
  * Runtime Settings Management
@@ -1473,13 +1477,9 @@ async function buildSerieIdMap() {
 
 	try {
 		const nextData = JSON.parse(nextDataScript.textContent)
-		if (nextData.props?.pageProps?.list) {
-			nextData.props.pageProps.list.forEach((item) => {
-				if (item.raw_id && item.serie_id) {
-					serieIdMap.set(item.raw_id.toString(), item.serie_id.toString())
-				}
-			})
-		}
+		const pageProps = nextData.props?.pageProps
+
+		extractIdsFromPageProps(pageProps)
 		debug_debugLog(`Built serie_id map with ${serieIdMap.size} entries`)
 
 		// Validate mapping was successful
@@ -1492,6 +1492,79 @@ async function buildSerieIdMap() {
 		console.error("Error parsing __NEXT_DATA__:", error)
 		return false
 	}
+}
+
+/**
+ * Extract serie IDs from page props
+ * @param {Object} pageProps - Next.js page props
+ */
+function extractIdsFromPageProps(pageProps) {
+	if (!pageProps) {
+		return
+	}
+
+	if (pageProps.series && Array.isArray(pageProps.series)) {
+		pageProps.series.forEach((item) => {
+			if (item.raw_id && item.id) {
+				serieIdMap.set(item.raw_id.toString(), item.id.toString())
+			}
+		})
+	}
+
+	if (pageProps.list && Array.isArray(pageProps.list)) {
+		pageProps.list.forEach((item) => {
+			if (item.raw_id && item.serie_id) {
+				serieIdMap.set(item.raw_id.toString(), item.serie_id.toString())
+			}
+		})
+	}
+}
+
+/**
+ * Update mapping by fetching Next.js data for a URL
+ * @param {string} url - The URL to fetch data for
+ * @returns {Promise<boolean>} Success status
+ */
+async function updateMappingFromFetch(url) {
+	try {
+		// Get buildId from existing DOM since it doesn't change in session
+		const nextDataScript = document.querySelector('script[id="__NEXT_DATA__"]')
+		if (!nextDataScript) {
+			return false
+		}
+
+		const initialData = JSON.parse(nextDataScript.textContent)
+		const buildId = initialData.buildId
+		if (!buildId) {
+			return false
+		}
+
+		const urlObj = new URL(url)
+		let pathname = urlObj.pathname
+		// Ensure no trailing slash for data URL construction (Next.js quirks)
+		if (pathname.length > 1 && pathname.endsWith("/")) {
+			pathname = pathname.slice(0, -1)
+		}
+
+		// Construct _next/data URL
+		const dataUrl = `/_next/data/${buildId}${pathname}.json${urlObj.search}`
+
+		debug_debugLog(`Fetching data mapping from: ${dataUrl}`)
+		const response = await fetch(dataUrl)
+		if (!response.ok) {
+			return false
+		}
+
+		const data = await response.json()
+		if (data && data.pageProps) {
+			extractIdsFromPageProps(data.pageProps)
+			debug_debugLog(`Updated map from fetch. Size: ${serieIdMap.size}`)
+			return true
+		}
+	} catch (error) {
+		console.error("Error fetching Next.js data:", error)
+	}
+	return false
 }
 
 /**
@@ -1551,6 +1624,14 @@ function mapping_validateSerieIdMapping(rawId, serieId) {
  */
 function mapping_getSerieIdForRawId(rawId) {
 	return serieIdMap.get(rawId) || null
+}
+
+/**
+ * Get the entire serieIdMap
+ * @returns {Map<string, string>} The serie ID map
+ */
+function getSerieIdMap() {
+	return serieIdMap
 }
 
 /**
@@ -1751,6 +1832,10 @@ function clearAllCachedAssessments() {
  * Create the settings panel
  */
 function createSettingsPanel() {
+	if (document.getElementById("gemini-settings-panel")) {
+		return
+	}
+
 	const modelOptions = GEMINI_MODELS.map((model) => `<option value="${model}">${model}</option>`).join("")
 	const panelHTML = `
 	<div id="gemini-settings-panel">
@@ -1777,6 +1862,10 @@ function createSettingsPanel() {
  * Create the API key modal
  */
 function createApiKeyModal() {
+	if (document.getElementById("gemini-api-key-modal")) {
+		return
+	}
+
 	const modalHTML = `
 		<div id="gemini-api-key-modal">
 			<h3>How to Get Your FREE Gemini API Token</h3>
@@ -1803,7 +1892,17 @@ function createApiKeyModal() {
 /**
  * Setup configuration menu commands
  */
+let configSetupDone = false
+
+/**
+ * Setup configuration menu commands
+ */
 function setupConfig() {
+	if (configSetupDone) {
+		return
+	}
+	configSetupDone = true
+
 	// Open Settings menu command
 	GM_registerMenuCommand("Open Settings", () => {
 		const settings = getRuntimeSettings()
@@ -2243,6 +2342,76 @@ function cards_addLoadingOverlay(card) {
 	}
 	return overlay
 }
+/**
+ * Parse novel data from a novel-finder card
+ * @param {Element} card - The card element
+ * @returns {Object|null} The extracted novel data or null if parsing fails
+ */
+function parseNovelFinderCard(card) {
+	const titleElement = card.querySelector(".title-wrap .title")
+	const rawTitleElement = card.querySelector(".rawtitle")
+	const urlElement = card.querySelector(".title-wrap a")
+	const coverElement = card.querySelector("picture source[srcset]")
+	const detailLines = card.querySelectorAll(".detail-line")
+	const genres = Array.from(card.querySelectorAll(".genres .genre")).map((g) => g.textContent.trim())
+	const descriptionElement = card.querySelector(".desc-wrap .description")
+
+	if (!titleElement || !urlElement) {
+		return null
+	}
+
+	const url = urlElement.href
+	const match = url.match(/\/novel\/(\d+)\//)
+	if (!match || !match[1]) {
+		return null
+	}
+	const rawId = match[1]
+	const serieId = match[1]
+
+	let status = "Unknown"
+	let views = "0"
+	let chapters = "0"
+	let readers = "0"
+
+	if (detailLines.length > 0) {
+		const statusLine = detailLines[0].textContent.trim()
+		const statusMatch = statusLine.match(/•\s*(\w+)/)
+		if (statusMatch && statusMatch[1]) {
+			status = statusMatch[1]
+		}
+		const viewsMatch = statusLine.match(/·\s*([\d,]+)\s*views/i)
+		if (viewsMatch && viewsMatch[1]) {
+			views = viewsMatch[1].replace(/,/g, "")
+		}
+	}
+
+	if (detailLines.length > 1) {
+		const chapterLine = detailLines[1].textContent.trim()
+		const chapterMatch = chapterLine.match(/([\d,]+)\s*Chapters/i)
+		if (chapterMatch && chapterMatch[1]) {
+			chapters = chapterMatch[1].replace(/,/g, "")
+		}
+		const readersMatch = chapterLine.match(/·\s*([\d,]+)\s*Readers/i)
+		if (readersMatch && readersMatch[1]) {
+			readers = readersMatch[1].replace(/,/g, "")
+		}
+	}
+
+	return {
+		serie_id: serieId, // This will be null
+		raw_id: rawId,
+		title: titleElement.firstChild.textContent.trim(),
+		raw_title: rawTitleElement ? rawTitleElement.textContent.trim() : "",
+		url: url,
+		cover_url: coverElement ? coverElement.srcset.split(" ")[0] : "",
+		status: status,
+		views: parseInt(views, 10),
+		chapters: parseInt(chapters, 10),
+		readers: parseInt(readers, 10),
+		genres: genres,
+		description: descriptionElement ? descriptionElement.textContent.trim() : "",
+	}
+}
 
 ;// ./src/assessment/schema.js
 /**
@@ -2554,106 +2723,97 @@ async function batch_processBatch(batch, overlays) {
 		const card = batch[i]
 		const overlay = overlays[i]
 
-		const linkElement = card.querySelector("a[data-novel-id]")
-		let serieId = null
-		let rawId = null
+		const currentUrl = window.location.href
+		let novelData
+		let serieId
+		let rawId
 
-		if (linkElement) {
+		if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+			novelData = parseNovelFinderCard(card)
+			if (!novelData) {
+				console.warn("Skipping card, failed to parse novel-finder card.", card)
+				continue
+			}
+			rawId = novelData.raw_id
+			serieId = mapping_getSerieIdForRawId(rawId)
+		} else {
+			const linkElement = card.querySelector("a.title")
 			rawId = linkElement.dataset.novelId
-			if (rawId) {
-				serieId = mapping_getSerieIdForRawId(rawId)
-				if (serieId) {
-					// Strict validation before proceeding
-					if (!mapping_validateSerieIdMapping(rawId, serieId)) {
-						console.error(`PROCESSING HALTED: Invalid serie_id "${serieId}" for raw_id ${rawId}`)
-						mapping_showMappingFailureNotification()
-						// Remove all overlays and halt
-						overlays.forEach((o) => o && o.remove())
-						throw new Error("Invalid serie_id mapping detected")
-					}
-				} else {
-					// NO FALLBACK - strict mapping required
-					console.error(`PROCESSING HALTED: No serie_id mapping for raw_id ${rawId}`)
-					mapping_showMappingFailureNotification()
-					// Remove all overlays and halt
-					overlays.forEach((o) => o && o.remove())
-					throw new Error("No serie_id mapping found")
+			serieId = mapping_getSerieIdForRawId(rawId)
+
+			if (!serieId) {
+				console.error("PROCESSING HALTED: Unable to obtain valid serie_id")
+				mapping_showMappingFailureNotification()
+				overlays.forEach((o) => o && o.remove())
+				throw new Error("No valid serie_id available")
+			}
+
+			const titleElement = card.querySelector("a.title")
+			let title = titleElement ? titleElement.textContent.trim() : "No title"
+			if (titleElement && title.startsWith("#")) {
+				title = title.split(" ").slice(1).join(" ")
+			}
+			const rawTitleSpan = titleElement ? titleElement.querySelector(".rawtitle") : null
+			if (rawTitleSpan) {
+				title = title.replace(rawTitleSpan.textContent, "").trim()
+			}
+
+			const viewsLine = card.querySelector(".detail-buttons .detail-line:nth-of-type(1)")
+			let totalViews = 0
+			if (viewsLine) {
+				const match = viewsLine.textContent.match(/(\d+) views/)
+				if (match) {
+					totalViews = parseInt(match[1], 10)
 				}
 			}
-		}
 
-		if (!serieId) {
-			// If no serieId after validation, halt processing
-			console.error("PROCESSING HALTED: Unable to obtain valid serie_id")
-			mapping_showMappingFailureNotification()
-			// Remove all overlays and halt
-			overlays.forEach((o) => o && o.remove())
-			throw new Error("No valid serie_id available")
-		}
+			const readersLine = card.querySelector(".detail-buttons .detail-line:nth-of-type(2)")
+			let totalReaders = 0
+			if (readersLine) {
+				const match = readersLine.textContent.match(/(\d+) Readers/)
+				if (match) {
+					totalReaders = parseInt(match[1], 10)
+				}
+			}
 
-		// Not cached, prepare for analysis
-		const titleElement = card.querySelector("a.title")
-		let title = titleElement ? titleElement.textContent.trim() : "No title"
-		if (titleElement && title.startsWith("#")) {
-			title = title.split(" ").slice(1).join(" ")
-		}
-		const rawTitleSpan = titleElement ? titleElement.querySelector(".rawtitle") : null
-		if (rawTitleSpan) {
-			title = title.replace(rawTitleSpan.textContent, "").trim()
-		}
+			const ratingElement = card.querySelector(".rating-text")
+			let rating = 0
+			if (ratingElement) {
+				const match = ratingElement.textContent.match(/(\d+\.\d+)/)
+				if (match) {
+					rating = parseFloat(match[1])
+				}
+			}
 
-		const viewsLine = card.querySelector(".detail-buttons .detail-line:nth-of-type(1)")
-		let totalViews = 0
-		if (viewsLine) {
-			const match = viewsLine.textContent.match(/(\d+) views/)
-			if (match) {
-				totalViews = parseInt(match[1], 10)
+			const tagElements = card.querySelectorAll(".genres .genre")
+			const genres = Array.from(tagElements).map((el) => el.textContent.trim())
+			const description = card.querySelector(".description")?.textContent.trim() || "No description."
+
+			novelData = {
+				serie_id: serieId,
+				raw_id: rawId,
+				title,
+				totalViews,
+				totalReaders,
+				rating,
+				genres,
+				description,
 			}
 		}
-
-		const readersLine = card.querySelector(".detail-buttons .detail-line:nth-of-type(2)")
-		let totalReaders = 0
-		if (readersLine) {
-			const match = readersLine.textContent.match(/(\d+) Readers/)
-			if (match) {
-				totalReaders = parseInt(match[1], 10)
-			}
-		}
-
-		const ratingElement = card.querySelector(".rating-text")
-		let rating = 0
-		if (ratingElement) {
-			const match = ratingElement.textContent.match(/(\d+\.\d+)/)
-			if (match) {
-				rating = parseFloat(match[1])
-			}
-		}
-
-		const tagElements = card.querySelectorAll(".genres .genre")
-		const genres = Array.from(tagElements).map((el) => el.textContent.trim())
-
-		const description = card.querySelector(".description")?.textContent.trim() || "No description."
 
 		const reviews = await fetchReviews(serieId)
 		const reviewsWithComments = reviews.filter((r) => r.comment)
-
 		const reviewsText = reviewsWithComments
 			.map((r) => `- User: ${r.username || "Unknown"}\n- Rating: ${r.rate}/5\n- Comment: ${r.comment}`)
 			.join("\n\n")
-		// Extract usernames for color coding
 		const availableUsernames = extractUsernamesFromReviews(reviewsWithComments)
+
 		novelsData.push({
-			serieId,
-			title,
-			totalViews,
-			totalReaders,
-			rating,
-			genres,
-			description,
+			...novelData,
 			reviewsText,
 			availableUsernames,
 		})
-		batchResults.push({ card, overlay, serieId })
+		batchResults.push({ card, overlay, serieId: serieId })
 
 		await delay(FETCH_DELAY_MS) // Wait between each fetch to be polite
 	}
@@ -2713,30 +2873,27 @@ async function batch_processBatch(batch, overlays) {
  * Display cached assessments on the page
  */
 function displayCachedAssessments() {
-	const novelCards = Array.from(
-		document.querySelectorAll(
-			".series-list > .card:not([data-gemini-processed]):not([data-gemini-cached-checked])",
-		),
-	)
+	const currentUrl = window.location.href
+	const cardSelector = currentUrl.includes("wtr-lab.com/en/novel-finder")
+		? ".card:not([data-gemini-processed]):not([data-gemini-cached-checked])"
+		: ".series-list > .card:not([data-gemini-processed]):not([data-gemini-cached-checked])"
+	const novelCards = Array.from(document.querySelectorAll(cardSelector))
 	novelCards.forEach((card) => {
-		const linkElement = card.querySelector("a[data-novel-id]")
+		const linkElement = card.querySelector("a.title")
 		let serieId = null
 		let rawId = null
 
 		if (linkElement) {
-			rawId = linkElement.dataset.novelId
-			if (rawId) {
-				serieId = mapping_getSerieIdForRawId(rawId)
-			} else {
-				// Fallback: Extract from href or use raw_id directly
-				if (linkElement.href) {
-					const match = linkElement.href.match(/\/novel\/(\d+)\//)
-					if (match && match[1]) {
-						serieId = match[1]
-					}
+			if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+				const match = linkElement.href.match(/\/novel\/(\d+)\//)
+				if (match && match[1]) {
+					rawId = match[1]
+					serieId = mapping_getSerieIdForRawId(rawId)
 				}
-				if (!serieId && rawId) {
-					serieId = rawId // Last resort
+			} else {
+				rawId = linkElement.dataset.novelId
+				if (rawId) {
+					serieId = mapping_getSerieIdForRawId(rawId)
 				}
 			}
 		}
@@ -2782,32 +2939,43 @@ async function processAllNovels() {
 		return
 	}
 
-	const allNovelCards = Array.from(document.querySelectorAll(".series-list > .card"))
+	const currentUrl = window.location.href
+	const cardSelector = currentUrl.includes("wtr-lab.com/en/novel-finder") ? ".card" : ".series-list > .card"
+	const allNovelCards = Array.from(document.querySelectorAll(cardSelector))
 	const uncachedNovelCards = []
 
 	for (const card of allNovelCards) {
-		const linkElement = card.querySelector("a[data-novel-id]")
+		const linkElement = card.querySelector("a.title")
 		let serieId = null
 		let rawId = null
 
 		if (linkElement) {
-			rawId = linkElement.dataset.novelId
-			if (rawId) {
-				serieId = getSerieIdForRawId(rawId)
-
-				// Strict validation: verify the mapping is valid
-				if (serieId && !validateSerieIdMapping(rawId, serieId)) {
-					console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
-					debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
-					showMappingFailureNotification()
-					return
+			if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+				const match = linkElement.href.match(/\/novel\/(\d+)\//)
+				if (match && match[1]) {
+					rawId = match[1]
+					serieId = getSerieIdForRawId(rawId)
 				}
 			} else {
-				// NO FALLBACK - strict mapping required
-				console.warn(`No serie_id mapping found for raw_id ${rawId}. Skipping this novel.`)
-				debugLog(`Skipping novel with raw_id ${rawId}: No mapping in serieIdMap`)
-				continue
+				rawId = linkElement.dataset.novelId
+				if (rawId) {
+					serieId = getSerieIdForRawId(rawId)
+				}
 			}
+		}
+
+		// Strict validation: verify the mapping is valid
+		if (serieId && !validateSerieIdMapping(rawId, serieId)) {
+			console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
+			debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
+			showMappingFailureNotification()
+			return
+		}
+
+		if (!serieId) {
+			console.warn(`No serie_id mapping found for card. Skipping this novel.`)
+			debugLog(`Skipping novel: No mapping in serieIdMap`)
+			continue
 		}
 
 		if (serieId && !getCachedAssessment(serieId)) {
@@ -2862,28 +3030,38 @@ async function processSpecificNovel(novelCardElement) {
 	}
 
 	// Extract novel data from the provided card element
-	const linkElement = novelCardElement.querySelector("a[data-novel-id]")
+	const linkElement = novelCardElement.querySelector("a.title")
 	let serieId = null
 	let rawId = null
+	const currentUrl = window.location.href
 
 	if (linkElement) {
-		rawId = linkElement.dataset.novelId
-		if (rawId) {
-			serieId = mapping_getSerieIdForRawId(rawId)
-
-			// Strict validation: verify the mapping is valid
-			if (serieId && !mapping_validateSerieIdMapping(rawId, serieId)) {
-				console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
-				debug_debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
-				mapping_showMappingFailureNotification()
-				return
+		if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
+			const match = linkElement.href.match(/\/novel\/(\d+)\//)
+			if (match && match[1]) {
+				rawId = match[1]
+				serieId = mapping_getSerieIdForRawId(rawId)
 			}
 		} else {
-			// NO FALLBACK - strict mapping required
-			console.warn(`No serie_id mapping found for raw_id ${rawId}. Cannot process this novel.`)
-			debug_debugLog(`Cannot process novel with raw_id ${rawId}: No mapping in serieIdMap`)
-			return
+			rawId = linkElement.dataset.novelId
+			if (rawId) {
+				serieId = mapping_getSerieIdForRawId(rawId)
+			}
 		}
+	}
+
+	// Strict validation: verify the mapping is valid
+	if (serieId && !mapping_validateSerieIdMapping(rawId, serieId)) {
+		console.error(`PROCESSING HALTED: Invalid serie_id mapping detected for raw_id ${rawId}`)
+		debug_debugLog(`Processing aborted: Mapping validation failed for raw_id ${rawId}`)
+		mapping_showMappingFailureNotification()
+		return
+	}
+
+	if (!serieId) {
+		console.warn(`No serie_id mapping found for card. Cannot process this novel.`)
+		debug_debugLog(`Cannot process novel: No mapping in serieIdMap`)
+		return
 	}
 
 	// Check if novel is already cached
@@ -2912,6 +3090,74 @@ async function processSpecificNovel(novelCardElement) {
 			}
 		})
 	}
+}
+
+;// ./src/utils/router.js
+/**
+ * Router Utility
+ * Handles detection of client-side route changes (Single Page Application navigation)
+ */
+
+
+
+// Store the original history methods
+const originalPushState = history.pushState
+const originalReplaceState = history.replaceState
+
+/**
+ * Setup a listener for route changes
+ * Detects History API changes (pushState, replaceState) and popstate events
+ * @param {Function} callback - Function to execute when route changes
+ */
+function setupRouteChangeListener(callback) {
+	debug_debugLog("Setting up route change listener")
+
+	let debounceTimer = null
+
+	// Handler for route changes with debounce
+	const handleRouteChange = () => {
+		const currentUrl = window.location.href
+		debug_debugLog(`Route change detected (raw): ${currentUrl}`)
+
+		if (debounceTimer) {
+			clearTimeout(debounceTimer)
+		}
+
+		debounceTimer = setTimeout(() => {
+			debug_debugLog(`Route change processed (debounced): ${currentUrl}`)
+			callback(currentUrl)
+		}, 500) // 500ms debounce delay
+	}
+
+	// 1. Listen for popstate (browser back/forward buttons)
+	window.addEventListener("popstate", handleRouteChange)
+
+	// 2. Monkey-patch pushState
+	history.pushState = function (...args) {
+		const result = originalPushState.apply(this, args)
+		handleRouteChange()
+		return result
+	}
+
+	// 3. Monkey-patch replaceState
+	history.replaceState = function (...args) {
+		const result = originalReplaceState.apply(this, args)
+		handleRouteChange()
+		return result
+	}
+
+	// 4. Fallback: Check for URL changes periodically in case other methods miss it
+	// (Optional, but useful for some frameworks that suppress events)
+	let lastUrl = window.location.href
+	setInterval(() => {
+		const currentUrl = window.location.href
+		if (currentUrl !== lastUrl) {
+			lastUrl = currentUrl
+			handleRouteChange()
+		}
+	}, 1000)
+
+	debug_debugLog("Route change listener active")
 }
 
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
@@ -3257,33 +3503,128 @@ var _mobile_update = injectStylesIntoStyleTag_default()(_mobile/* default */.A, 
 
 
 
+
 // Import CSS styles
 
+
+// Supported routes regex patterns
+const main_SUPPORTED_ROUTES = [/^https:\/\/wtr-lab\.com\/en\/for-you/, /^https:\/\/wtr-lab\.com\/en\/novel-finder/]
+
+// Debounce timer
+let debounceTimer = null
+
+// Global observer reference
+let observer = null
+
+/**
+ * Initialize application logic for the current view
+ */
+async function initView() {
+	debug_debugLog("Initializing view context...")
+	resetMappingFailureNotification()
+
+	// Validate and build serie_id mapping
+	// We use the retry logic here to allow time for DOM/data to settle
+	const mappingSuccess = await validateAndBuildSerieIdMap()
+
+	if (!mappingSuccess) {
+		console.warn("View initialization: Unable to build/update serie_id mapping")
+		// We don't necessarily block everything, as cached data might still work
+		// if the map isn't strictly required for display (though it is for processing)
+		mapping_showMappingFailureNotification()
+	} else {
+		// If mapping succeeded, ensure we update the UI
+		displayCachedAssessments()
+	}
+}
+
+/**
+ * Check if the current route is supported
+ * @param {string} url - The URL to check
+ * @returns {boolean} True if supported
+ */
+function isRouteSupported(url) {
+	return main_SUPPORTED_ROUTES.some((regex) => regex.test(url))
+}
+
+/**
+ * Handle client-side route changes
+ * @param {string} url - The new URL
+ */
+async function handleRouteChange(url) {
+	// Clear existing timer
+	if (debounceTimer) {
+		clearTimeout(debounceTimer)
+	}
+
+	// Set new timer for debounce
+	debounceTimer = setTimeout(async () => {
+		debug_debugLog(`Processing route change for: ${url}`)
+
+		if (!isRouteSupported(url)) {
+			debug_debugLog("[WTR-Lab] Unsupported route. Going idle.")
+			return
+		}
+
+		// Attempt to update mapping from Next.js data
+		// This is crucial for SPA navigation where __NEXT_DATA__ is stale
+		const success = await updateMappingFromFetch(url)
+
+		if (success) {
+			resetMappingFailureNotification()
+			displayCachedAssessments()
+		} else {
+			// Fallback to standard initialization (checks DOM/stale data)
+			await initView()
+		}
+	}, 500)
+}
 
 /**
  * Main initialization function
  */
 async function main() {
+	debug_debugLog("WTR-Lab Novel Reviewer starting...")
 	loadConfig()
 
-	// Validate and build serie_id mapping with retry logic
-	const mappingSuccess = await validateAndBuildSerieIdMap()
-	if (!mappingSuccess) {
-		console.error("INITIALIZATION FAILED: Unable to build serie_id mapping after all retries")
-		mapping_showMappingFailureNotification()
-		// Continue with initialization but user will be notified
-	}
-
+	// Setup global UI components (one-time setup)
 	createSettingsPanel()
 	createApiKeyModal()
 	setupConfig()
 
-	const observer = new MutationObserver(() => {
-		if (document.querySelector(".series-list")) {
+	// Setup route change listener for SPA navigation
+	setupRouteChangeListener(handleRouteChange)
+
+	// Run initial view setup
+	await initView()
+
+	// Setup MutationObserver to handle dynamic content loading
+	// This ensures cards are processed as they appear in the DOM
+	if (observer) {
+		observer.disconnect()
+	}
+
+	observer = new MutationObserver((mutations) => {
+		if (!isRouteSupported(window.location.href)) {
+			return
+		}
+
+		// Check if we should update (basic debounce/check could be added if needed)
+		const hasRelevantMutation = mutations.some(
+			(m) =>
+				m.addedNodes.length > 0 &&
+				(m.target.classList?.contains("series-list") ||
+					document.querySelector(".series-list") ||
+					document.querySelector(".card")),
+		)
+
+		if (hasRelevantMutation) {
 			displayCachedAssessments()
 		}
 	})
+
 	observer.observe(document.body, { childList: true, subtree: true })
+	debug_debugLog("MutationObserver started")
 }
 
 ;// ./src/index.js

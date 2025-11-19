@@ -27,13 +27,9 @@ export async function buildSerieIdMap() {
 
 	try {
 		const nextData = JSON.parse(nextDataScript.textContent)
-		if (nextData.props?.pageProps?.list) {
-			nextData.props.pageProps.list.forEach((item) => {
-				if (item.raw_id && item.serie_id) {
-					serieIdMap.set(item.raw_id.toString(), item.serie_id.toString())
-				}
-			})
-		}
+		const pageProps = nextData.props?.pageProps
+
+		extractIdsFromPageProps(pageProps)
 		debugLog(`Built serie_id map with ${serieIdMap.size} entries`)
 
 		// Validate mapping was successful
@@ -46,6 +42,79 @@ export async function buildSerieIdMap() {
 		console.error("Error parsing __NEXT_DATA__:", error)
 		return false
 	}
+}
+
+/**
+ * Extract serie IDs from page props
+ * @param {Object} pageProps - Next.js page props
+ */
+function extractIdsFromPageProps(pageProps) {
+	if (!pageProps) {
+		return
+	}
+
+	if (pageProps.series && Array.isArray(pageProps.series)) {
+		pageProps.series.forEach((item) => {
+			if (item.raw_id && item.id) {
+				serieIdMap.set(item.raw_id.toString(), item.id.toString())
+			}
+		})
+	}
+
+	if (pageProps.list && Array.isArray(pageProps.list)) {
+		pageProps.list.forEach((item) => {
+			if (item.raw_id && item.serie_id) {
+				serieIdMap.set(item.raw_id.toString(), item.serie_id.toString())
+			}
+		})
+	}
+}
+
+/**
+ * Update mapping by fetching Next.js data for a URL
+ * @param {string} url - The URL to fetch data for
+ * @returns {Promise<boolean>} Success status
+ */
+export async function updateMappingFromFetch(url) {
+	try {
+		// Get buildId from existing DOM since it doesn't change in session
+		const nextDataScript = document.querySelector('script[id="__NEXT_DATA__"]')
+		if (!nextDataScript) {
+			return false
+		}
+
+		const initialData = JSON.parse(nextDataScript.textContent)
+		const buildId = initialData.buildId
+		if (!buildId) {
+			return false
+		}
+
+		const urlObj = new URL(url)
+		let pathname = urlObj.pathname
+		// Ensure no trailing slash for data URL construction (Next.js quirks)
+		if (pathname.length > 1 && pathname.endsWith("/")) {
+			pathname = pathname.slice(0, -1)
+		}
+
+		// Construct _next/data URL
+		const dataUrl = `/_next/data/${buildId}${pathname}.json${urlObj.search}`
+
+		debugLog(`Fetching data mapping from: ${dataUrl}`)
+		const response = await fetch(dataUrl)
+		if (!response.ok) {
+			return false
+		}
+
+		const data = await response.json()
+		if (data && data.pageProps) {
+			extractIdsFromPageProps(data.pageProps)
+			debugLog(`Updated map from fetch. Size: ${serieIdMap.size}`)
+			return true
+		}
+	} catch (error) {
+		console.error("Error fetching Next.js data:", error)
+	}
+	return false
 }
 
 /**
@@ -105,6 +174,14 @@ export function validateSerieIdMapping(rawId, serieId) {
  */
 export function getSerieIdForRawId(rawId) {
 	return serieIdMap.get(rawId) || null
+}
+
+/**
+ * Get the entire serieIdMap
+ * @returns {Map<string, string>} The serie ID map
+ */
+export function getSerieIdMap() {
+	return serieIdMap
 }
 
 /**

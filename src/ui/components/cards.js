@@ -261,3 +261,73 @@ export function addLoadingOverlay(card) {
 	}
 	return overlay
 }
+/**
+ * Parse novel data from a novel-finder card
+ * @param {Element} card - The card element
+ * @returns {Object|null} The extracted novel data or null if parsing fails
+ */
+export function parseNovelFinderCard(card) {
+	const titleElement = card.querySelector(".title-wrap .title")
+	const rawTitleElement = card.querySelector(".rawtitle")
+	const urlElement = card.querySelector(".title-wrap a")
+	const coverElement = card.querySelector("picture source[srcset]")
+	const detailLines = card.querySelectorAll(".detail-line")
+	const genres = Array.from(card.querySelectorAll(".genres .genre")).map((g) => g.textContent.trim())
+	const descriptionElement = card.querySelector(".desc-wrap .description")
+
+	if (!titleElement || !urlElement) {
+		return null
+	}
+
+	const url = urlElement.href
+	const match = url.match(/\/novel\/(\d+)\//)
+	if (!match || !match[1]) {
+		return null
+	}
+	const rawId = match[1]
+	const serieId = match[1]
+
+	let status = "Unknown"
+	let views = "0"
+	let chapters = "0"
+	let readers = "0"
+
+	if (detailLines.length > 0) {
+		const statusLine = detailLines[0].textContent.trim()
+		const statusMatch = statusLine.match(/•\s*(\w+)/)
+		if (statusMatch && statusMatch[1]) {
+			status = statusMatch[1]
+		}
+		const viewsMatch = statusLine.match(/·\s*([\d,]+)\s*views/i)
+		if (viewsMatch && viewsMatch[1]) {
+			views = viewsMatch[1].replace(/,/g, "")
+		}
+	}
+
+	if (detailLines.length > 1) {
+		const chapterLine = detailLines[1].textContent.trim()
+		const chapterMatch = chapterLine.match(/([\d,]+)\s*Chapters/i)
+		if (chapterMatch && chapterMatch[1]) {
+			chapters = chapterMatch[1].replace(/,/g, "")
+		}
+		const readersMatch = chapterLine.match(/·\s*([\d,]+)\s*Readers/i)
+		if (readersMatch && readersMatch[1]) {
+			readers = readersMatch[1].replace(/,/g, "")
+		}
+	}
+
+	return {
+		serie_id: serieId, // This will be null
+		raw_id: rawId,
+		title: titleElement.firstChild.textContent.trim(),
+		raw_title: rawTitleElement ? rawTitleElement.textContent.trim() : "",
+		url: url,
+		cover_url: coverElement ? coverElement.srcset.split(" ")[0] : "",
+		status: status,
+		views: parseInt(views, 10),
+		chapters: parseInt(chapters, 10),
+		readers: parseInt(readers, 10),
+		genres: genres,
+		description: descriptionElement ? descriptionElement.textContent.trim() : "",
+	}
+}

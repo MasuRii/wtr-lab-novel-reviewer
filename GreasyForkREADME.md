@@ -5,7 +5,7 @@
 A powerful userscript that uses Google's Gemini AI to analyze novels on WTR-Lab. Get comprehensive AI-powered assessments, color-coded review summaries, and detailed analysis across multiple categories without leaving the "For You" page.
 
 [![Install WTR-Lab Novel Reviewer](https://img.shields.io/badge/Install%20directly-Greasy%20Fork-green.svg)](https://greasyfork.org/en/scripts/555556)
-[![Version](https://img.shields.io/badge/Version-1.8.5-blue.svg)](#changelog)
+[![Version](https://img.shields.io/badge/Version-1.8.6-blue.svg)](#changelog)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](#license)
 
 ---
@@ -67,10 +67,12 @@ A powerful userscript that uses Google's Gemini AI to analyze novels on WTR-Lab.
 5. Click "**Save**"
 
 ### Step 4: Start Analyzing!
-1. On the "For You" page, look for analysis buttons (📊) in the top-right corner of novel card titles
-2. Click individual buttons to analyze each novel separately
-3. Hover over the ✨ icon on processed cards to view detailed assessments
-4. Use "Clear Analyzed Novel Cache" in settings when needed
+1. Navigate to either "For You" page or "Novel Finder" page
+2. Look for analysis buttons (📊) in the top-right corner of novel card titles
+3. Click individual buttons to analyze each novel separately
+4. Hover over the ✨ icon on processed cards to view detailed assessments
+5. Use "Clear Analyzed Novel Cache" in settings when needed
+6. The script automatically handles client-side navigation and route changes
 
 ---
 
@@ -204,7 +206,22 @@ Enable Debug Logging in settings to see:
 ### Changelog
 For detailed version history, see [Changelog.md](Changelog.md)
 
-### Current Version: 1.8.4 (November 16, 2025)
+### Current Version: 1.8.6 (November 19, 2025)
+**Enhanced Navigation & Route Support:**
+- 🚀 **Reactive Execution**: Implemented reactive script execution for client-side route changes in Next.js SPA environment
+- 🛣️ **Novel Finder Support**: Extended full support to `https://wtr-lab.com/en/novel-finder*` pages with dedicated card parser
+- 🔄 **Route Handling**: Added robust route change detection with debouncing (500ms) to prevent race conditions
+- 🛡️ **Route Whitelisting**: Implemented scope restrictions to prevent processing on unsupported pages
+- 🐛 **Bug Fixes**: Resolved route leakage issues and fixed critical serie_id mapping bug on novel-finder pages
+
+### Version: 1.8.5 (November 18, 2025)
+**Novel Finder Integration:**
+- 🚀 **Page Support**: Extended web scraping capabilities to support `https://wtr-lab.com/en/novel-finder*` URL pattern
+- 🏗️ **Parser Integration**: Implemented new card parser for novel-finder page's unique HTML structure
+- 🐛 **Critical Fix**: Corrected wrong serie_id usage ensuring accurate review data for novel-finder analysis
+- 🔧 **Build Fix**: Resolved multiple linting errors that were causing build failures
+
+### Version: 1.8.4 (November 16, 2025)
 **Major UI/UX Improvements:**
 - 🚀 **Cache Management**: Implemented dedicated cache clearing functionality with user confirmation
 - 🔄 **UI Consolidation**: Removed floating analysis button and centralized functionality in card-level triggers
