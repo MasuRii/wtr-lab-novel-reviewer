@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer [DEV]
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.5-dev.1763495539471
+// @version 1.8.6-dev.1763558780597
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you
@@ -1316,6 +1316,9 @@ const DEFAULT_BATCH_LIMIT = 1
 const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 const DEFAULT_DEBUG_LOGGING_ENABLED = false
 
+// Supported routes for script execution (Regex patterns)
+const SUPPORTED_ROUTES = (/* unused pure expression or super */ null && ([/^https:\/\/wtr-lab\.com\/en\/for-you/, /^https:\/\/wtr-lab\.com\/en\/novel-finder/]))
+
 ;// ./src/config/settings.js
 /**
  * Runtime Settings Management
@@ -1475,23 +1478,8 @@ async function buildSerieIdMap() {
 	try {
 		const nextData = JSON.parse(nextDataScript.textContent)
 		const pageProps = nextData.props?.pageProps
-		const currentUrl = window.location.href
 
-		if (currentUrl.includes("wtr-lab.com/en/novel-finder")) {
-			if (pageProps?.series) {
-				pageProps.series.forEach((item) => {
-					if (item.raw_id && item.id) {
-						serieIdMap.set(item.raw_id.toString(), item.id.toString())
-					}
-				})
-			}
-		} else if (pageProps?.list) {
-			pageProps.list.forEach((item) => {
-				if (item.raw_id && item.serie_id) {
-					serieIdMap.set(item.raw_id.toString(), item.serie_id.toString())
-				}
-			})
-		}
+		extractIdsFromPageProps(pageProps)
 		debug_debugLog(`Built serie_id map with ${serieIdMap.size} entries`)
 
 		// Validate mapping was successful
@@ -1504,6 +1492,79 @@ async function buildSerieIdMap() {
 		console.error("Error parsing __NEXT_DATA__:", error)
 		return false
 	}
+}
+
+/**
+ * Extract serie IDs from page props
+ * @param {Object} pageProps - Next.js page props
+ */
+function extractIdsFromPageProps(pageProps) {
+	if (!pageProps) {
+		return
+	}
+
+	if (pageProps.series && Array.isArray(pageProps.series)) {
+		pageProps.series.forEach((item) => {
+			if (item.raw_id && item.id) {
+				serieIdMap.set(item.raw_id.toString(), item.id.toString())
+			}
+		})
+	}
+
+	if (pageProps.list && Array.isArray(pageProps.list)) {
+		pageProps.list.forEach((item) => {
+			if (item.raw_id && item.serie_id) {
+				serieIdMap.set(item.raw_id.toString(), item.serie_id.toString())
+			}
+		})
+	}
+}
+
+/**
+ * Update mapping by fetching Next.js data for a URL
+ * @param {string} url - The URL to fetch data for
+ * @returns {Promise<boolean>} Success status
+ */
+async function updateMappingFromFetch(url) {
+	try {
+		// Get buildId from existing DOM since it doesn't change in session
+		const nextDataScript = document.querySelector('script[id="__NEXT_DATA__"]')
+		if (!nextDataScript) {
+			return false
+		}
+
+		const initialData = JSON.parse(nextDataScript.textContent)
+		const buildId = initialData.buildId
+		if (!buildId) {
+			return false
+		}
+
+		const urlObj = new URL(url)
+		let pathname = urlObj.pathname
+		// Ensure no trailing slash for data URL construction (Next.js quirks)
+		if (pathname.length > 1 && pathname.endsWith("/")) {
+			pathname = pathname.slice(0, -1)
+		}
+
+		// Construct _next/data URL
+		const dataUrl = `/_next/data/${buildId}${pathname}.json${urlObj.search}`
+
+		debug_debugLog(`Fetching data mapping from: ${dataUrl}`)
+		const response = await fetch(dataUrl)
+		if (!response.ok) {
+			return false
+		}
+
+		const data = await response.json()
+		if (data && data.pageProps) {
+			extractIdsFromPageProps(data.pageProps)
+			debug_debugLog(`Updated map from fetch. Size: ${serieIdMap.size}`)
+			return true
+		}
+	} catch (error) {
+		console.error("Error fetching Next.js data:", error)
+	}
+	return false
 }
 
 /**
@@ -1771,6 +1832,10 @@ function clearAllCachedAssessments() {
  * Create the settings panel
  */
 function createSettingsPanel() {
+	if (document.getElementById("gemini-settings-panel")) {
+		return
+	}
+
 	const modelOptions = GEMINI_MODELS.map((model) => `<option value="${model}">${model}</option>`).join("")
 	const panelHTML = `
 	<div id="gemini-settings-panel">
@@ -1797,6 +1862,10 @@ function createSettingsPanel() {
  * Create the API key modal
  */
 function createApiKeyModal() {
+	if (document.getElementById("gemini-api-key-modal")) {
+		return
+	}
+
 	const modalHTML = `
 		<div id="gemini-api-key-modal">
 			<h3>How to Get Your FREE Gemini API Token</h3>
@@ -1823,7 +1892,17 @@ function createApiKeyModal() {
 /**
  * Setup configuration menu commands
  */
+let configSetupDone = false
+
+/**
+ * Setup configuration menu commands
+ */
 function setupConfig() {
+	if (configSetupDone) {
+		return
+	}
+	configSetupDone = true
+
 	// Open Settings menu command
 	GM_registerMenuCommand("Open Settings", () => {
 		const settings = getRuntimeSettings()
@@ -3013,6 +3092,74 @@ async function processSpecificNovel(novelCardElement) {
 	}
 }
 
+;// ./src/utils/router.js
+/**
+ * Router Utility
+ * Handles detection of client-side route changes (Single Page Application navigation)
+ */
+
+
+
+// Store the original history methods
+const originalPushState = history.pushState
+const originalReplaceState = history.replaceState
+
+/**
+ * Setup a listener for route changes
+ * Detects History API changes (pushState, replaceState) and popstate events
+ * @param {Function} callback - Function to execute when route changes
+ */
+function setupRouteChangeListener(callback) {
+	debug_debugLog("Setting up route change listener")
+
+	let debounceTimer = null
+
+	// Handler for route changes with debounce
+	const handleRouteChange = () => {
+		const currentUrl = window.location.href
+		debug_debugLog(`Route change detected (raw): ${currentUrl}`)
+
+		if (debounceTimer) {
+			clearTimeout(debounceTimer)
+		}
+
+		debounceTimer = setTimeout(() => {
+			debug_debugLog(`Route change processed (debounced): ${currentUrl}`)
+			callback(currentUrl)
+		}, 500) // 500ms debounce delay
+	}
+
+	// 1. Listen for popstate (browser back/forward buttons)
+	window.addEventListener("popstate", handleRouteChange)
+
+	// 2. Monkey-patch pushState
+	history.pushState = function (...args) {
+		const result = originalPushState.apply(this, args)
+		handleRouteChange()
+		return result
+	}
+
+	// 3. Monkey-patch replaceState
+	history.replaceState = function (...args) {
+		const result = originalReplaceState.apply(this, args)
+		handleRouteChange()
+		return result
+	}
+
+	// 4. Fallback: Check for URL changes periodically in case other methods miss it
+	// (Optional, but useful for some frameworks that suppress events)
+	let lastUrl = window.location.href
+	setInterval(() => {
+		const currentUrl = window.location.href
+		if (currentUrl !== lastUrl) {
+			lastUrl = currentUrl
+			handleRouteChange()
+		}
+	}, 1000)
+
+	debug_debugLog("Route change listener active")
+}
+
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
 var injectStylesIntoStyleTag = __webpack_require__(72);
 var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
@@ -3356,33 +3503,128 @@ var _mobile_update = injectStylesIntoStyleTag_default()(_mobile/* default */.A, 
 
 
 
+
 // Import CSS styles
 
+
+// Supported routes regex patterns
+const main_SUPPORTED_ROUTES = [/^https:\/\/wtr-lab\.com\/en\/for-you/, /^https:\/\/wtr-lab\.com\/en\/novel-finder/]
+
+// Debounce timer
+let debounceTimer = null
+
+// Global observer reference
+let observer = null
+
+/**
+ * Initialize application logic for the current view
+ */
+async function initView() {
+	debug_debugLog("Initializing view context...")
+	resetMappingFailureNotification()
+
+	// Validate and build serie_id mapping
+	// We use the retry logic here to allow time for DOM/data to settle
+	const mappingSuccess = await validateAndBuildSerieIdMap()
+
+	if (!mappingSuccess) {
+		console.warn("View initialization: Unable to build/update serie_id mapping")
+		// We don't necessarily block everything, as cached data might still work
+		// if the map isn't strictly required for display (though it is for processing)
+		mapping_showMappingFailureNotification()
+	} else {
+		// If mapping succeeded, ensure we update the UI
+		displayCachedAssessments()
+	}
+}
+
+/**
+ * Check if the current route is supported
+ * @param {string} url - The URL to check
+ * @returns {boolean} True if supported
+ */
+function isRouteSupported(url) {
+	return main_SUPPORTED_ROUTES.some((regex) => regex.test(url))
+}
+
+/**
+ * Handle client-side route changes
+ * @param {string} url - The new URL
+ */
+async function handleRouteChange(url) {
+	// Clear existing timer
+	if (debounceTimer) {
+		clearTimeout(debounceTimer)
+	}
+
+	// Set new timer for debounce
+	debounceTimer = setTimeout(async () => {
+		debug_debugLog(`Processing route change for: ${url}`)
+
+		if (!isRouteSupported(url)) {
+			debug_debugLog("[WTR-Lab] Unsupported route. Going idle.")
+			return
+		}
+
+		// Attempt to update mapping from Next.js data
+		// This is crucial for SPA navigation where __NEXT_DATA__ is stale
+		const success = await updateMappingFromFetch(url)
+
+		if (success) {
+			resetMappingFailureNotification()
+			displayCachedAssessments()
+		} else {
+			// Fallback to standard initialization (checks DOM/stale data)
+			await initView()
+		}
+	}, 500)
+}
 
 /**
  * Main initialization function
  */
 async function main() {
+	debug_debugLog("WTR-Lab Novel Reviewer starting...")
 	loadConfig()
 
-	// Validate and build serie_id mapping with retry logic
-	const mappingSuccess = await validateAndBuildSerieIdMap()
-	if (!mappingSuccess) {
-		console.error("INITIALIZATION FAILED: Unable to build serie_id mapping after all retries")
-		mapping_showMappingFailureNotification()
-		// Continue with initialization but user will be notified
-	}
-
+	// Setup global UI components (one-time setup)
 	createSettingsPanel()
 	createApiKeyModal()
 	setupConfig()
 
-	const observer = new MutationObserver(() => {
-		if (document.querySelector(".series-list")) {
+	// Setup route change listener for SPA navigation
+	setupRouteChangeListener(handleRouteChange)
+
+	// Run initial view setup
+	await initView()
+
+	// Setup MutationObserver to handle dynamic content loading
+	// This ensures cards are processed as they appear in the DOM
+	if (observer) {
+		observer.disconnect()
+	}
+
+	observer = new MutationObserver((mutations) => {
+		if (!isRouteSupported(window.location.href)) {
+			return
+		}
+
+		// Check if we should update (basic debounce/check could be added if needed)
+		const hasRelevantMutation = mutations.some(
+			(m) =>
+				m.addedNodes.length > 0 &&
+				(m.target.classList?.contains("series-list") ||
+					document.querySelector(".series-list") ||
+					document.querySelector(".card")),
+		)
+
+		if (hasRelevantMutation) {
 			displayCachedAssessments()
 		}
 	})
+
 	observer.observe(document.body, { childList: true, subtree: true })
+	debug_debugLog("MutationObserver started")
 }
 
 ;// ./src/index.js

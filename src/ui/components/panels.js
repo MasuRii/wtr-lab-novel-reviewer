@@ -11,6 +11,10 @@ import { clearAllCachedAssessments } from "../../core/cache.js"
  * Create the settings panel
  */
 export function createSettingsPanel() {
+	if (document.getElementById("gemini-settings-panel")) {
+		return
+	}
+
 	const modelOptions = GEMINI_MODELS.map((model) => `<option value="${model}">${model}</option>`).join("")
 	const panelHTML = `
 	<div id="gemini-settings-panel">
@@ -37,6 +41,10 @@ export function createSettingsPanel() {
  * Create the API key modal
  */
 export function createApiKeyModal() {
+	if (document.getElementById("gemini-api-key-modal")) {
+		return
+	}
+
 	const modalHTML = `
 		<div id="gemini-api-key-modal">
 			<h3>How to Get Your FREE Gemini API Token</h3>
@@ -63,7 +71,17 @@ export function createApiKeyModal() {
 /**
  * Setup configuration menu commands
  */
+let configSetupDone = false
+
+/**
+ * Setup configuration menu commands
+ */
 export function setupConfig() {
+	if (configSetupDone) {
+		return
+	}
+	configSetupDone = true
+
 	// Open Settings menu command
 	GM_registerMenuCommand("Open Settings", () => {
 		const settings = getRuntimeSettings()

@@ -1,6 +1,6 @@
 # WTR-Lab Novel Reviewer
 
-[![Version](https://img.shields.io/badge/version-1.8.5-blue)](https://github.com/MasuRii/wtr-lab-novel-reviewer)
+[![Version](https://img.shields.io/badge/version-1.8.6-blue)](https://github.com/MasuRii/wtr-lab-novel-reviewer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#development-setup)
 [![Greasy Fork](https://img.shields.io/badge/Install-Greasy%20Fork-green.svg)](https://greasyfork.org/en/scripts/555556)

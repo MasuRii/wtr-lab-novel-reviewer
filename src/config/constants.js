@@ -55,3 +55,6 @@ export const FETCH_DELAY_MS = 300 // Wait 300ms between each fetch to be polite
 export const DEFAULT_BATCH_LIMIT = 1
 export const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 export const DEFAULT_DEBUG_LOGGING_ENABLED = false
+
+// Supported routes for script execution (Regex patterns)
+export const SUPPORTED_ROUTES = [/^https:\/\/wtr-lab\.com\/en\/for-you/, /^https:\/\/wtr-lab\.com\/en\/novel-finder/]
