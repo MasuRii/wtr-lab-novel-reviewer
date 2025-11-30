@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.7] - 2025-11-30
+
+### 🚀 Added
+- Implemented a mobile-specific close button (`×`) on the summary popup for improved usability on touch devices.
+
+### 🔄 Changed
+- Downgraded the "first load" initialization failure from a critical error to a user-friendly warning notification.
+- The "Analyze Novel" button is now visually disabled if the required data mapping fails on load.
+
+### 🐛 Fixed
+- Resolved a touch event issue causing the mobile close button to "flicker" on activation. The fix prevents "ghost clicks" by handling `touchstart` and `click` events properly.
+- Clicking the disabled "Analyze Novel" button now shows a clear notification advising the user to refresh the page, instead of failing silently.
+
+### 📱 Enhanced
+- Improved mobile user experience by providing a clear, tappable target to close the summary view.
+- Enhanced user feedback by guiding users on how to resolve initialization issues.
+
 ## [1.8.6] - 2025-11-19
 
 ### 🚀 Added

@@ -202,6 +202,14 @@ export function getMappingSize() {
 }
 
 /**
+ * Check if mapping is valid (has entries)
+ * @returns {boolean} True if mapping has entries
+ */
+export function isMappingValid() {
+	return serieIdMap.size > 0
+}
+
+/**
  * Reset mapping failure notification flag
  */
 export function resetMappingFailureNotification() {
@@ -220,7 +228,8 @@ export function showMappingFailureNotification() {
 
 	// Create notification element with fallback icon
 	const iconClass = window.__ICON_REPLACEMENTS__ ? "material-icons-fallback" : "material-icons"
-	const errorIcon = window.__ICON_REPLACEMENTS__ ? "⚠️" : "error"
+	// Use warning icon instead of error for initialization issues as they might be temporary or partial
+	const errorIcon = window.__ICON_REPLACEMENTS__ ? "⚠️" : "warning"
 
 	const notification = document.createElement("div")
 	notification.id = "gemini-mapping-failure-notification"

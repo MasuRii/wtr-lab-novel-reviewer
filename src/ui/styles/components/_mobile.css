@@ -1,5 +1,25 @@
 /* Mobile considerations */
+.mobile-close-btn {
+	display: none; /* Hidden by default on desktop */
+}
+
 @media (width <= 768px) {
+	.mobile-close-btn {
+		display: block;
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 30px;
+		height: 30px;
+		background: rgb(255 255 255 / 10%);
+		border-radius: 50%;
+		text-align: center;
+		line-height: 30px;
+		font-size: 20px;
+		cursor: pointer;
+		z-index: 101; /* Above content */
+	}
+
 	.gemini-summary-card {
 		position: fixed;
 		top: 50%;
