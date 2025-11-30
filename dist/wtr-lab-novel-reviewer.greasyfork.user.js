@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name WTR-Lab Novel Reviewer
 // @description Analyzes novels on wtr-lab.com using Gemini AI to provide comprehensive assessments including character development, plot structure, world-building, themes & messages, and writing style.
-// @version 1.8.6
+// @version 1.8.7
 // @author MasuRii
 // @supportURL https://github.com/MasuRii/wtr-lab-novel-reviewer/issues
 // @match https://wtr-lab.com/en/for-you
@@ -42,7 +42,27 @@
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `/* Mobile considerations */
+.mobile-close-btn {
+	display: none; /* Hidden by default on desktop */
+}
+
 @media (width <= 768px) {
+	.mobile-close-btn {
+		display: block;
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		width: 30px;
+		height: 30px;
+		background: rgb(255 255 255 / 10%);
+		border-radius: 50%;
+		text-align: center;
+		line-height: 30px;
+		font-size: 20px;
+		cursor: pointer;
+		z-index: 101; /* Above content */
+	}
+
 	.gemini-summary-card {
 		position: fixed;
 		top: 50%;
@@ -778,6 +798,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Material Icons font declarations */
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `/* Button Components */
+
+.gemini-summary-trigger.disabled {
+	background-color: rgb(128 128 128 / 60%); /* Greyed out */
+	cursor: not-allowed;
+	opacity: 0.7;
+}
 `, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
@@ -1652,6 +1678,14 @@ function mapping_getMappingSize() {
 }
 
 /**
+ * Check if mapping is valid (has entries)
+ * @returns {boolean} True if mapping has entries
+ */
+function isMappingValid() {
+	return serieIdMap.size > 0
+}
+
+/**
  * Reset mapping failure notification flag
  */
 function resetMappingFailureNotification() {
@@ -1670,7 +1704,8 @@ function mapping_showMappingFailureNotification() {
 
 	// Create notification element with fallback icon
 	const iconClass = window.__ICON_REPLACEMENTS__ ? "material-icons-fallback" : "material-icons"
-	const errorIcon = window.__ICON_REPLACEMENTS__ ? "⚠️" : "error"
+	// Use warning icon instead of error for initialization issues as they might be temporary or partial
+	const errorIcon = window.__ICON_REPLACEMENTS__ ? "⚠️" : "warning"
 
 	const notification = document.createElement("div")
 	notification.id = "gemini-mapping-failure-notification"
@@ -2087,6 +2122,7 @@ function colorCodeReviewSummary(reviewSummary, availableUsernames) {
 
 
 
+
 /**
  * Get CSS class for rating
  * @param {string} rating - The rating value
@@ -2203,6 +2239,7 @@ function updateCardUI(card, analysis) {
 		const availableUsernames = analysis.availableUsernames || []
 
 		let detailedAssessment = `<h4>AI Novel Assessment</h4>`
+		detailedAssessment += `<div class="mobile-close-btn">×</div>`
 		detailedAssessment += `<div class="summary-toggle collapsed" data-target="novel-summary">`
 		detailedAssessment += `<span>Novel Summary</span>`
 		detailedAssessment += `<span class="${iconConfig.iconClass} toggle-icon">${iconConfig.expandIcon}</span>`
@@ -2272,13 +2309,28 @@ function updateCardUI(card, analysis) {
 	// Create the trigger button as a separate element
 	const summaryTrigger = document.createElement("div")
 	summaryTrigger.className = "gemini-summary-trigger"
-	summaryTrigger.title = hasAnalysis ? "Show AI Summary" : "Analyze Novel"
+
+	// Check mapping validity
+	const mappingValid = isMappingValid()
+	if (!mappingValid) {
+		summaryTrigger.classList.add("disabled")
+		summaryTrigger.title = "Initialization Failed - Refresh Page"
+	} else {
+		summaryTrigger.title = hasAnalysis ? "Show AI Summary" : "Analyze Novel"
+	}
+
 	summaryTrigger.innerHTML = `<span class="${iconConfig.iconClass}">${iconConfig.autoAwesomeIcon}</span>`
 
 	// Add click event for dual-purpose functionality
 	let isLocked = false
 	summaryTrigger.addEventListener("click", async function (event) {
 		event.stopPropagation()
+
+		// Check disabled state
+		if (summaryTrigger.classList.contains("disabled")) {
+			alert("The reviewer failed to initialize correctly. Please refresh the page to get correct data.")
+			return
+		}
 
 		// If no analysis (no cache), initiate analysis workflow
 		if (!hasAnalysis) {
@@ -2301,6 +2353,22 @@ function updateCardUI(card, analysis) {
 
 	// Add toggle functionality after DOM insertion only if we have analysis
 	if (hasAnalysis) {
+		// Add close button listener for mobile
+		const closeBtn = summaryCard.querySelector(".mobile-close-btn")
+		if (closeBtn) {
+			const handleClose = (e) => {
+				// Prevent ghost clicks on mobile
+				if (e.type === "touchstart") {
+					e.preventDefault()
+				}
+				e.stopPropagation()
+				summaryCard.classList.remove("locked")
+				isLocked = false
+			}
+
+			closeBtn.addEventListener("click", handleClose)
+			closeBtn.addEventListener("touchstart", handleClose, { passive: false })
+		}
 		const toggles = summaryCard.querySelectorAll(".summary-toggle")
 		toggles.forEach((toggle) => {
 			toggle.addEventListener("click", function () {

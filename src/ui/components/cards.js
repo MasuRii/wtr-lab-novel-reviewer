@@ -5,6 +5,7 @@
 
 import { colorCodeReviewSummary } from "../../utils/colors.js"
 import { processSpecificNovel } from "../../processing/workflow.js"
+import { isMappingValid } from "../../core/mapping.js"
 
 /**
  * Get CSS class for rating
@@ -122,6 +123,7 @@ export function updateCardUI(card, analysis) {
 		const availableUsernames = analysis.availableUsernames || []
 
 		let detailedAssessment = `<h4>AI Novel Assessment</h4>`
+		detailedAssessment += `<div class="mobile-close-btn">×</div>`
 		detailedAssessment += `<div class="summary-toggle collapsed" data-target="novel-summary">`
 		detailedAssessment += `<span>Novel Summary</span>`
 		detailedAssessment += `<span class="${iconConfig.iconClass} toggle-icon">${iconConfig.expandIcon}</span>`
@@ -191,13 +193,28 @@ export function updateCardUI(card, analysis) {
 	// Create the trigger button as a separate element
 	const summaryTrigger = document.createElement("div")
 	summaryTrigger.className = "gemini-summary-trigger"
-	summaryTrigger.title = hasAnalysis ? "Show AI Summary" : "Analyze Novel"
+
+	// Check mapping validity
+	const mappingValid = isMappingValid()
+	if (!mappingValid) {
+		summaryTrigger.classList.add("disabled")
+		summaryTrigger.title = "Initialization Failed - Refresh Page"
+	} else {
+		summaryTrigger.title = hasAnalysis ? "Show AI Summary" : "Analyze Novel"
+	}
+
 	summaryTrigger.innerHTML = `<span class="${iconConfig.iconClass}">${iconConfig.autoAwesomeIcon}</span>`
 
 	// Add click event for dual-purpose functionality
 	let isLocked = false
 	summaryTrigger.addEventListener("click", async function (event) {
 		event.stopPropagation()
+
+		// Check disabled state
+		if (summaryTrigger.classList.contains("disabled")) {
+			alert("The reviewer failed to initialize correctly. Please refresh the page to get correct data.")
+			return
+		}
 
 		// If no analysis (no cache), initiate analysis workflow
 		if (!hasAnalysis) {
@@ -220,6 +237,22 @@ export function updateCardUI(card, analysis) {
 
 	// Add toggle functionality after DOM insertion only if we have analysis
 	if (hasAnalysis) {
+		// Add close button listener for mobile
+		const closeBtn = summaryCard.querySelector(".mobile-close-btn")
+		if (closeBtn) {
+			const handleClose = (e) => {
+				// Prevent ghost clicks on mobile
+				if (e.type === "touchstart") {
+					e.preventDefault()
+				}
+				e.stopPropagation()
+				summaryCard.classList.remove("locked")
+				isLocked = false
+			}
+
+			closeBtn.addEventListener("click", handleClose)
+			closeBtn.addEventListener("touchstart", handleClose, { passive: false })
+		}
 		const toggles = summaryCard.querySelectorAll(".summary-toggle")
 		toggles.forEach((toggle) => {
 			toggle.addEventListener("click", function () {
